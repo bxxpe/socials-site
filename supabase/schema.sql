@@ -45,6 +45,11 @@ grant execute on function public.increment_views(uuid) to anon, authenticated;
 -- Public bucket (files are readable by anyone via their URL — they're shown
 -- on your public page anyway). Only signed-in users can upload; only the
 -- uploader can replace or delete their files. 50MB per-file cap.
+--
+-- NOTE: if the insert below errors or the bucket still doesn't exist after
+-- running (some projects don't allow creating buckets from SQL), create it
+-- by hand instead: Storage -> New bucket -> name "media" -> Public: ON.
+-- The policies below always run fine from SQL.
 
 insert into storage.buckets (id, name, public, file_size_limit)
 values ('media', 'media', true, 52428800)

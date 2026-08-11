@@ -432,7 +432,9 @@ input[type="range"]::-moz-range-thumb {
   backdrop-filter: blur(var(--card-blur));
   -webkit-backdrop-filter: blur(var(--card-blur));
   border: 1px solid rgba(255, 255, 255, 0.09);
-  box-shadow: 0 24px 70px -24px rgba(0, 0, 0, 0.7),
+  /* the drop shadow leans opposite the tilt, so the card feels lifted */
+  box-shadow: calc(var(--rx, 0) * -16px) calc(24px + var(--ry, 0) * 16px) 70px -24px
+      rgba(0, 0, 0, 0.75),
     0 0 90px -32px color-mix(in srgb, var(--accent) 60%, transparent);
   transform-style: preserve-3d;
   will-change: transform;
@@ -456,10 +458,68 @@ input[type="range"]::-moz-range-thumb {
   border-radius: inherit;
   background: radial-gradient(
     420px circle at var(--px, 50%) var(--py, 50%),
-    rgba(255, 255, 255, 0.07),
+    rgba(255, 255, 255, calc(0.09 * var(--reflect, 1))),
     transparent 45%
   );
   pointer-events: none;
+  z-index: 4;
+}
+
+/* A hard specular streak that swings to face the cursor, like a glossy card.
+   Fades in with tilt magnitude so a resting card stays flat and clean. */
+.card.has-glare::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    calc(var(--glare-angle, 135) * 1deg),
+    transparent 30%,
+    rgba(255, 255, 255, calc(0.1 * var(--reflect, 1))) 45%,
+    rgba(255, 255, 255, calc(0.2 * var(--reflect, 1))) 50%,
+    rgba(255, 255, 255, calc(0.1 * var(--reflect, 1))) 55%,
+    transparent 70%
+  );
+  opacity: var(--tilt-mag, 0);
+  pointer-events: none;
+  z-index: 4;
+}
+
+/* Reflection layers live as real elements so they can sit above the content;
+   they opt out of the card's staggered entrance animation. */
+/* `i.` bumps specificity above `.entered .card > *`, which would otherwise
+   force opacity:1 on these layers and pin the reflections fully on. */
+.card > i.fx-layer {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  animation: none !important;
+  z-index: 5;
+}
+
+/* Holographic foil — an iridescent sweep that shifts hue with the tilt. */
+.card > i.fx-holo {
+  background: linear-gradient(
+    calc(var(--glare-angle, 135) * 1deg + 40deg),
+    rgba(255, 0, 128, 0.22) 0%,
+    rgba(255, 205, 0, 0.18) 20%,
+    rgba(0, 255, 170, 0.2) 40%,
+    rgba(0, 170, 255, 0.2) 60%,
+    rgba(170, 0, 255, 0.22) 80%,
+    rgba(255, 0, 128, 0.22) 100%
+  );
+  background-size: 260% 260%;
+  background-position: calc(50% + var(--rx, 0) * 40%) calc(50% + var(--ry, 0) * 40%);
+  mix-blend-mode: color-dodge;
+  opacity: calc(var(--tilt-mag, 0) * 0.55 * var(--reflect, 1));
+}
+
+/* Rim light: the edge facing the cursor picks up a bright inner outline. */
+.card > i.fx-edge {
+  box-shadow: inset calc(var(--rx, 0) * -10px) calc(var(--ry, 0) * 10px) 22px -12px
+    rgba(255, 255, 255, calc(0.55 * var(--reflect, 1)));
+  opacity: var(--tilt-mag, 0);
 }
 
 .card > * {

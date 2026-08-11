@@ -33,7 +33,12 @@ export const DEFAULT_CONFIG = {
     sheen: true,
     typewriter: true,
     trail: true,
+    glare: true,
+    holo: false,
   },
+
+  tilt_strength: 14, // max degrees of card rotation
+  reflect_intensity: 1, // multiplier on the sheen/glare/holo layers
 
   trail_style: 'glow', // 'glow' | 'comet' | 'sparkle'
   trail_color: '', // empty = follow the accent colour

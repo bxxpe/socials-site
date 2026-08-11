@@ -22,7 +22,7 @@ export default function ProfileView({ profile, preview = false, entered = true, 
   const reduced =
     typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
-  const tiltRef = useTilt(fx.tilt && !preview)
+  const tiltRef = useTilt(fx.tilt && !preview, cfg.tilt_strength)
   const typing = fx.typewriter && !preview && !reduced && entered
   const bio = useTypewriter(cfg.bio || '', typing)
 
@@ -71,6 +71,7 @@ export default function ProfileView({ profile, preview = false, entered = true, 
     '--bg-blur-scale': cfg.bg_blur / 200,
     '--font': fontStack,
     '--presence-font': dc.presence_font ? resolveFont(dc.presence_font, discordFontId) : fontStack,
+    '--reflect': cfg.reflect_intensity,
   }
 
   const name = cfg.display_name || profile.username || 'unnamed'
@@ -97,7 +98,15 @@ export default function ProfileView({ profile, preview = false, entered = true, 
       {!preview && <Particles enabled={fx.particles && !reduced} accent={cfg.accent} />}
 
       <main className={`profile-center${entered ? ' entered' : ''}`}>
-        <section className={`card${fx.sheen && !preview ? ' has-sheen' : ''}`} ref={tiltRef}>
+        <section
+          className={`card${fx.sheen && !preview ? ' has-sheen' : ''}${
+            fx.glare && !preview ? ' has-glare' : ''
+          }`}
+          ref={tiltRef}
+        >
+          {/* reflection layers — excluded from the card's entrance animation */}
+          {fx.holo && !preview && <i className="fx-layer fx-holo" aria-hidden="true" />}
+          {fx.glare && !preview && <i className="fx-layer fx-edge" aria-hidden="true" />}
           <div className="avatar-wrap" style={{ '--i': 0 }}>
             <span className="avatar-box">
               {avatarSrc ? (

@@ -833,7 +833,35 @@ export default function DashboardPage() {
             <Toggle label="particles" hint="floating dust in the background" on={cfg.effects.particles} onChange={(v) => patchFx({ particles: v })} />
             <Toggle label="glow orbs" hint="soft colour clouds behind the card" on={cfg.effects.orbs} onChange={(v) => patchFx({ orbs: v })} />
             <Toggle label="3d tilt" hint="card follows the cursor" on={cfg.effects.tilt} onChange={(v) => patchFx({ tilt: v })} />
-            <Toggle label="sheen" hint="light reflection on the card" on={cfg.effects.sheen} onChange={(v) => patchFx({ sheen: v })} />
+            {cfg.effects.tilt && (
+              <div className="sub-settings">
+                <Slider
+                  label="tilt intensity"
+                  value={cfg.tilt_strength}
+                  min={2}
+                  max={30}
+                  step={1}
+                  onChange={(tilt_strength) => patchCfg({ tilt_strength })}
+                  format={(v) => `${v}°`}
+                />
+              </div>
+            )}
+            <Toggle label="sheen" hint="soft light that follows your cursor" on={cfg.effects.sheen} onChange={(v) => patchFx({ sheen: v })} />
+            <Toggle label="glare" hint="a specular streak that swings to face the cursor, plus a rim light on the leading edge" on={cfg.effects.glare} onChange={(v) => patchFx({ glare: v })} />
+            <Toggle label="holographic foil" hint="iridescent rainbow sheen that shifts with the tilt — bold" on={cfg.effects.holo} onChange={(v) => patchFx({ holo: v })} />
+            {(cfg.effects.sheen || cfg.effects.glare || cfg.effects.holo) && (
+              <div className="sub-settings">
+                <Slider
+                  label="reflection intensity"
+                  value={cfg.reflect_intensity}
+                  min={0.2}
+                  max={2}
+                  step={0.1}
+                  onChange={(reflect_intensity) => patchCfg({ reflect_intensity })}
+                  format={(v) => `${Math.round(v * 100)}%`}
+                />
+              </div>
+            )}
             <Toggle label="typewriter bio" hint="bio types itself out" on={cfg.effects.typewriter} onChange={(v) => patchFx({ typewriter: v })} />
             <Toggle label="cursor trail" hint="follows the mouse (desktop only)" on={cfg.effects.trail} onChange={(v) => patchFx({ trail: v })} />
 

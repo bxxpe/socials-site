@@ -39,6 +39,10 @@ export const DEFAULT_CONFIG = {
 
   tilt_strength: 14, // max degrees of card rotation
   reflect_intensity: 1, // multiplier on the sheen/glare/holo layers
+  card_border: 'none', // 'none' | 'glow' | 'gradient' | 'beam'
+  entrance: 'rise', // 'rise' | 'fade' | 'zoom' | 'flip' | 'blur' | 'glitch'
+  particle_style: 'dust', // 'dust' | 'snow' | 'rain' | 'matrix'
+  cursor_url: '', // custom cursor image
 
   trail_style: 'glow', // 'glow' | 'comet' | 'sparkle'
   trail_color: '', // empty = follow the accent colour

@@ -451,6 +451,136 @@ input[type="range"]::-moz-range-thumb {
   }
 }
 
+/* ---------- entrance styles ---------- */
+
+.entered .card.enter-fade {
+  animation: enter-fade 0.7s var(--ease-out) backwards;
+}
+@keyframes enter-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+.entered .card.enter-zoom {
+  animation: enter-zoom 0.65s var(--spring) backwards;
+}
+@keyframes enter-zoom {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+}
+
+.entered .card.enter-flip {
+  animation: enter-flip 0.8s var(--ease-out) backwards;
+}
+@keyframes enter-flip {
+  from {
+    opacity: 0;
+    transform: perspective(900px) rotateX(-28deg) translateY(28px);
+  }
+}
+
+.entered .card.enter-blur {
+  animation: enter-blur 0.8s var(--ease-out) backwards;
+}
+@keyframes enter-blur {
+  from {
+    opacity: 0;
+    filter: blur(18px);
+    transform: scale(1.04);
+  }
+}
+
+.entered .card.enter-glitch {
+  animation: enter-glitch 0.7s steps(2, end) backwards;
+}
+@keyframes enter-glitch {
+  0% {
+    opacity: 0;
+    transform: translate3d(-14px, 0, 0) skewX(9deg);
+  }
+  20% {
+    opacity: 1;
+    transform: translate3d(12px, -4px, 0) skewX(-7deg);
+  }
+  40% {
+    transform: translate3d(-8px, 3px, 0) skewX(5deg);
+  }
+  60% {
+    transform: translate3d(6px, -2px, 0) skewX(-3deg);
+  }
+  80% {
+    transform: translate3d(-3px, 1px, 0) skewX(1deg);
+  }
+  100% {
+    transform: none;
+  }
+}
+
+/* ---------- card borders ---------- */
+
+.card.border-glow {
+  border-color: color-mix(in srgb, var(--accent) 55%, transparent);
+  box-shadow: calc(var(--rx, 0) * -16px) calc(24px + var(--ry, 0) * 16px) 70px -24px
+      rgba(0, 0, 0, 0.75),
+    0 0 0 1px color-mix(in srgb, var(--accent) 30%, transparent),
+    0 0 34px -4px color-mix(in srgb, var(--accent) 55%, transparent);
+}
+
+/* Animated conic ring on its own layer — ::after is already the sheen.
+   Masked to a 2px edge so it reads as a border, not a wash over the card. */
+.card > i.fx-ring {
+  inset: -2px;
+  padding: 2px;
+  z-index: 6;
+  opacity: 1;
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask-composite: exclude;
+}
+
+.card.border-gradient > i.fx-ring {
+  background: conic-gradient(
+    from var(--ring, 0deg),
+    transparent 0deg,
+    var(--accent) 90deg,
+    #ffffff 160deg,
+    var(--accent) 230deg,
+    transparent 360deg
+  );
+  animation: ring-spin 5s linear infinite;
+}
+
+.card.border-beam > i.fx-ring {
+  background: conic-gradient(
+    from var(--ring, 0deg),
+    transparent 0deg,
+    transparent 300deg,
+    var(--accent) 350deg,
+    #ffffff 358deg,
+    transparent 360deg
+  );
+  animation: ring-spin 2.8s linear infinite;
+}
+
+@property --ring {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+@keyframes ring-spin {
+  to {
+    --ring: 360deg;
+  }
+}
+
 .card.has-sheen::after {
   content: "";
   position: absolute;
@@ -1048,6 +1178,38 @@ input[type="range"]::-moz-range-thumb {
   text-decoration: underline;
   text-underline-offset: 2px;
 }
+.theme-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(112px, 1fr));
+  gap: 8px;
+  margin-top: 4px;
+}
+.theme-card {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 11px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--muted);
+  transition: border-color 0.15s ease, color 0.15s ease, transform 0.15s var(--spring);
+}
+.theme-card:hover {
+  color: var(--text);
+  border-color: color-mix(in srgb, var(--accent) 45%, transparent);
+  transform: translateY(-2px);
+}
+.theme-swatch {
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  flex: none;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
 .badge-picker {
   display: flex;
   flex-wrap: wrap;

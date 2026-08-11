@@ -72,6 +72,9 @@ export default function ProfileView({ profile, preview = false, entered = true, 
     '--font': fontStack,
     '--presence-font': dc.presence_font ? resolveFont(dc.presence_font, discordFontId) : fontStack,
     '--reflect': cfg.reflect_intensity,
+    ...(cfg.cursor_url && !preview
+      ? { cursor: `url(${JSON.stringify(cfg.cursor_url)}) 4 4, auto` }
+      : null),
   }
 
   const name = cfg.display_name || profile.username || 'unnamed'
@@ -95,18 +98,29 @@ export default function ProfileView({ profile, preview = false, entered = true, 
           </div>
         )
       )}
-      {!preview && <Particles enabled={fx.particles && !reduced} accent={cfg.accent} />}
+      {!preview && (
+        <Particles
+          enabled={fx.particles && !reduced}
+          accent={cfg.accent}
+          variant={cfg.particle_style}
+        />
+      )}
 
       <main className={`profile-center${entered ? ' entered' : ''}`}>
         <section
-          className={`card${fx.sheen && !preview ? ' has-sheen' : ''}${
-            fx.glare && !preview ? ' has-glare' : ''
-          }`}
+          className={
+            `card enter-${cfg.entrance} border-${cfg.card_border}` +
+            `${fx.sheen && !preview ? ' has-sheen' : ''}` +
+            `${fx.glare && !preview ? ' has-glare' : ''}`
+          }
           ref={tiltRef}
         >
           {/* reflection layers — excluded from the card's entrance animation */}
           {fx.holo && !preview && <i className="fx-layer fx-holo" aria-hidden="true" />}
           {fx.glare && !preview && <i className="fx-layer fx-edge" aria-hidden="true" />}
+          {(cfg.card_border === 'gradient' || cfg.card_border === 'beam') && (
+            <i className="fx-layer fx-ring" aria-hidden="true" />
+          )}
           <div className="avatar-wrap" style={{ '--i': 0 }}>
             <span className="avatar-box">
               {avatarSrc ? (

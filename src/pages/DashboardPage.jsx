@@ -6,6 +6,7 @@ import { PLATFORMS, platformOf, SocialIcon } from '../lib/icons'
 import { newId } from '../lib/defaults'
 import { allZones, localZone } from '../hooks/useClock'
 import { FONTS } from '../lib/fonts'
+import { THEMES } from '../lib/themes'
 import { badgesFrom, badgeUrl, MANUAL_BADGES } from '../lib/badges'
 import { displayNameStyle, DISPLAY_FONTS } from '../lib/discordStyles'
 import {
@@ -730,6 +731,33 @@ export default function DashboardPage() {
             <h2>Appearance</h2>
 
             <div className="field">
+              <span>theme presets</span>
+              <small className="hint">
+                one click sets colours, border, entrance, background and trail — your links, bio and
+                discord settings aren't touched
+              </small>
+              <div className="theme-grid">
+                {THEMES.map((t) => (
+                  <button
+                    key={t.id}
+                    type="button"
+                    className="theme-card"
+                    onClick={() => patchCfg(t.patch)}
+                    title={`apply ${t.name}`}
+                  >
+                    <span
+                      className="theme-swatch"
+                      style={{
+                        background: `linear-gradient(135deg, ${t.swatch[0]}, ${t.swatch[1]})`,
+                      }}
+                    />
+                    {t.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="field">
               <span>accent colour</span>
               <AccentPicker value={cfg.accent} onChange={(accent) => patchCfg({ accent })} />
             </div>
@@ -829,8 +857,64 @@ export default function DashboardPage() {
               format={(v) => `${v}px`}
             />
 
+            <div className="two-col">
+              <Field label="card border">
+                <select
+                  value={cfg.card_border}
+                  onChange={(e) => patchCfg({ card_border: e.target.value })}
+                >
+                  <option value="none">none</option>
+                  <option value="glow">accent glow</option>
+                  <option value="gradient">spinning gradient</option>
+                  <option value="beam">light beam</option>
+                </select>
+              </Field>
+              <Field label="entrance animation">
+                <select value={cfg.entrance} onChange={(e) => patchCfg({ entrance: e.target.value })}>
+                  <option value="rise">rise</option>
+                  <option value="fade">fade</option>
+                  <option value="zoom">zoom</option>
+                  <option value="flip">flip</option>
+                  <option value="blur">blur in</option>
+                  <option value="glitch">glitch</option>
+                </select>
+              </Field>
+            </div>
+
+            <Field label="custom cursor" hint="small square png or gif (32×32 works best) — max 128px or browsers ignore it">
+              <div className="upload-row">
+                <input
+                  value={cfg.cursor_url}
+                  onChange={(e) => patchCfg({ cursor_url: e.target.value.trim() })}
+                  placeholder="https://…/cursor.png"
+                />
+                <UploadButton
+                  accept="image/png,image/gif,image/webp,image/svg+xml"
+                  kind="cursor"
+                  onDone={(url) => patchCfg({ cursor_url: url })}
+                  onError={flash}
+                />
+              </div>
+            </Field>
+
             <h3>Effects</h3>
-            <Toggle label="particles" hint="floating dust in the background" on={cfg.effects.particles} onChange={(v) => patchFx({ particles: v })} />
+            <Toggle label="particles" hint="animated background field" on={cfg.effects.particles} onChange={(v) => patchFx({ particles: v })} />
+            {cfg.effects.particles && (
+              <div className="sub-settings">
+                <Field label="background style">
+                  <Segmented
+                    value={cfg.particle_style}
+                    onChange={(particle_style) => patchCfg({ particle_style })}
+                    options={[
+                      { value: 'dust', label: 'dust' },
+                      { value: 'snow', label: 'snow' },
+                      { value: 'rain', label: 'rain' },
+                      { value: 'matrix', label: 'matrix' },
+                    ]}
+                  />
+                </Field>
+              </div>
+            )}
             <Toggle label="glow orbs" hint="soft colour clouds behind the card" on={cfg.effects.orbs} onChange={(v) => patchFx({ orbs: v })} />
             <Toggle label="3d tilt" hint="card follows the cursor" on={cfg.effects.tilt} onChange={(v) => patchFx({ tilt: v })} />
             {cfg.effects.tilt && (

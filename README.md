@@ -123,8 +123,11 @@ Add one line to `PLATFORMS` in `src/lib/icons.jsx` (icons come from
 
 ## Notes
 
-- The profile picture / background image / music are **URL fields** — paste a direct link
-  (Discord CDN, imgur, catbox, etc.). No file uploads to keep the free tiers clean.
+- Avatar / background / music support **direct uploads** (stored in a public Supabase Storage
+  bucket, 50MB per file, 1GB total on the free tier) or pasted URLs. Backgrounds accept images,
+  GIFs, and videos (mp4/webm — rendered as a muted loop); avatars accept images and GIFs. The
+  storage bucket + policies are created by `supabase/schema.sql` — if you ran an older version of
+  the schema, just run the whole file again (it's idempotent).
 - The view counter increments once per browser session via a locked-down SQL function — visitors
   can't touch anything else.
 - `VITE_OWNER_USERNAME` in `.env` pins which profile shows on `/` (only matters if more than one

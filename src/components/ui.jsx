@@ -1,6 +1,44 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
+import { uploadMedia } from '../lib/store'
 
 /** Tiny form kit for the dashboard — consistent, accessible, zero deps. */
+
+/** Hidden file input + button; hands back the uploaded file's public URL. */
+export function UploadButton({ accept, kind, onDone, onError }) {
+  const inputRef = useRef(null)
+  const [busy, setBusy] = useState(false)
+  return (
+    <>
+      <input
+        ref={inputRef}
+        type="file"
+        accept={accept}
+        style={{ display: 'none' }}
+        onChange={async (e) => {
+          const file = e.target.files?.[0]
+          e.target.value = ''
+          if (!file) return
+          setBusy(true)
+          try {
+            onDone(await uploadMedia(file, kind))
+          } catch (ex) {
+            onError?.(ex.message || 'upload failed')
+          } finally {
+            setBusy(false)
+          }
+        }}
+      />
+      <button
+        type="button"
+        className="btn btn-ghost"
+        disabled={busy}
+        onClick={() => inputRef.current?.click()}
+      >
+        {busy ? 'uploading…' : 'upload'}
+      </button>
+    </>
+  )
+}
 
 export function CopyRow({ value }) {
   const [ok, setOk] = useState(false)

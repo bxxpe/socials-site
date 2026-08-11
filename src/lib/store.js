@@ -120,6 +120,23 @@ export async function saveProfile(profile) {
   if (error) throw new Error(friendly(error))
 }
 
+/** Upload a file to the public `media` bucket and return its public URL. */
+export async function uploadMedia(file, kind = 'file') {
+  if (demoMode) throw new Error('uploads need supabase connected — paste a url instead')
+  const { data: userData } = await supabase.auth.getUser()
+  const uid = userData?.user?.id
+  if (!uid) throw new Error('sign in first')
+  const ext =
+    (file.name.split('.').pop() || 'bin').toLowerCase().replace(/[^a-z0-9]/g, '') || 'bin'
+  const path = `${uid}/${kind}-${Date.now()}.${ext}`
+  const { error } = await supabase.storage.from('media').upload(path, file, {
+    contentType: file.type || undefined,
+    cacheControl: '31536000',
+  })
+  if (error) throw new Error(error.message)
+  return supabase.storage.from('media').getPublicUrl(path).data.publicUrl
+}
+
 export async function incrementViews(profileId) {
   if (demoMode) {
     const p = demoProfile()

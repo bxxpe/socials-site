@@ -40,3 +40,27 @@ as $$
 $$;
 
 grant execute on function public.increment_views(uuid) to anon, authenticated;
+
+-- ---------- storage: uploads for avatar / background / audio ----------
+-- Public bucket (files are readable by anyone via their URL — they're shown
+-- on your public page anyway). Only signed-in users can upload; only the
+-- uploader can replace or delete their files. 50MB per-file cap.
+
+insert into storage.buckets (id, name, public, file_size_limit)
+values ('media', 'media', true, 52428800)
+on conflict (id) do update set public = true, file_size_limit = 52428800;
+
+drop policy if exists "authenticated can upload media" on storage.objects;
+create policy "authenticated can upload media"
+  on storage.objects for insert to authenticated
+  with check (bucket_id = 'media');
+
+drop policy if exists "owner can update own media" on storage.objects;
+create policy "owner can update own media"
+  on storage.objects for update to authenticated
+  using (bucket_id = 'media' and owner = auth.uid());
+
+drop policy if exists "owner can delete own media" on storage.objects;
+create policy "owner can delete own media"
+  on storage.objects for delete to authenticated
+  using (bucket_id = 'media' and owner = auth.uid());

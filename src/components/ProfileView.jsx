@@ -46,7 +46,13 @@ export default function ProfileView({ profile, preview = false, entered = true, 
   return (
     <div className={`profile-root${preview ? ' is-preview' : ''}`} style={vars}>
       {cfg.bg_image_url ? (
-        <div className="bg-image" style={{ backgroundImage: `url(${cfg.bg_image_url})` }} />
+        /\.(mp4|webm|mov|m4v)(\?|#|$)/i.test(cfg.bg_image_url) ? (
+          <div className="bg-media" aria-hidden="true">
+            <video className="bg-video" src={cfg.bg_image_url} autoPlay loop muted playsInline />
+          </div>
+        ) : (
+          <div className="bg-image" style={{ backgroundImage: `url(${cfg.bg_image_url})` }} />
+        )
       ) : (
         fx.orbs && (
           <div className="orbs" aria-hidden="true">

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Navigate, useLocation } from 'react-router-dom'
 import ProfileView from '../components/ProfileView'
-import { Field, Toggle, Segmented, Slider, AccentPicker, CopyRow } from '../components/ui'
+import { Field, Toggle, Segmented, Slider, AccentPicker, CopyRow, UploadButton } from '../components/ui'
 import { PLATFORMS, platformOf, SocialIcon } from '../lib/icons'
 import { newId } from '../lib/defaults'
 import {
@@ -239,12 +239,20 @@ export default function DashboardPage() {
                 placeholder="say something"
               />
             </Field>
-            <Field label="avatar url" hint="paste a direct image link — or connect discord and use your discord avatar">
-              <input
-                value={cfg.avatar_url}
-                onChange={(e) => patchCfg({ avatar_url: e.target.value.trim() })}
-                placeholder="https://…/you.png"
-              />
+            <Field label="avatar" hint="upload an image or gif, paste a link — or connect discord and use your discord avatar">
+              <div className="upload-row">
+                <input
+                  value={cfg.avatar_url}
+                  onChange={(e) => patchCfg({ avatar_url: e.target.value.trim() })}
+                  placeholder="https://…/you.png or .gif"
+                />
+                <UploadButton
+                  accept="image/*"
+                  kind="avatar"
+                  onDone={(url) => patchCfg({ avatar_url: url })}
+                  onError={flash}
+                />
+              </div>
             </Field>
             <Field label="location" hint="optional">
               <input
@@ -477,12 +485,23 @@ export default function DashboardPage() {
               </Field>
             </div>
 
-            <Field label="background image url" hint="optional — replaces the colour glow">
-              <input
-                value={cfg.bg_image_url}
-                onChange={(e) => patchCfg({ bg_image_url: e.target.value.trim() })}
-                placeholder="https://…/wallpaper.jpg"
-              />
+            <Field
+              label="background media"
+              hint="image, gif, or video (mp4/webm — loops muted). replaces the colour glow. max 50mb"
+            >
+              <div className="upload-row">
+                <input
+                  value={cfg.bg_image_url}
+                  onChange={(e) => patchCfg({ bg_image_url: e.target.value.trim() })}
+                  placeholder="https://…/wallpaper.jpg / .gif / .mp4"
+                />
+                <UploadButton
+                  accept="image/*,video/mp4,video/webm,video/quicktime"
+                  kind="background"
+                  onDone={(url) => patchCfg({ bg_image_url: url })}
+                  onError={flash}
+                />
+              </div>
             </Field>
 
             <Slider
@@ -520,12 +539,20 @@ export default function DashboardPage() {
                 maxLength={40}
               />
             </Field>
-            <Field label="background music url" hint="direct mp3 link — plays after the visitor clicks enter">
-              <input
-                value={cfg.audio_url}
-                onChange={(e) => patchCfg({ audio_url: e.target.value.trim() })}
-                placeholder="https://…/song.mp3"
-              />
+            <Field label="background music" hint="upload or paste an mp3 — plays after the visitor clicks enter">
+              <div className="upload-row">
+                <input
+                  value={cfg.audio_url}
+                  onChange={(e) => patchCfg({ audio_url: e.target.value.trim() })}
+                  placeholder="https://…/song.mp3"
+                />
+                <UploadButton
+                  accept="audio/*"
+                  kind="audio"
+                  onDone={(url) => patchCfg({ audio_url: url })}
+                  onError={flash}
+                />
+              </div>
             </Field>
             {cfg.audio_url && (
               <Slider

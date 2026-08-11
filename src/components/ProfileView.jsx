@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import Particles from './Particles'
 import DiscordPresence from './DiscordPresence'
 import useTilt from '../hooks/useTilt'
@@ -21,6 +22,12 @@ export default function ProfileView({ profile, preview = false, entered = true, 
   const tiltRef = useTilt(fx.tilt && !preview)
   const typing = fx.typewriter && !preview && !reduced && entered
   const bio = useTypewriter(cfg.bio || '', typing)
+
+  // The typewriter drives the browser tab title too (public page only).
+  useEffect(() => {
+    if (!typing) return
+    document.title = bio || cfg.display_name || profile.username || 'socials'
+  }, [typing, bio, cfg.display_name, profile.username])
 
   // Live Discord presence (Lanyard) — also live inside the dashboard preview.
   const presence = useLanyard(dc.user_id, Boolean(dc.show_presence && dc.user_id))

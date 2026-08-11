@@ -5,6 +5,7 @@ import ProfilePage from './pages/ProfilePage'
 const LoginPage = lazy(() => import('./pages/LoginPage'))
 const DashboardPage = lazy(() => import('./pages/DashboardPage'))
 const DiscordCallback = lazy(() => import('./pages/DiscordCallback'))
+const PrivacyPage = lazy(() => import('./pages/PrivacyPage'))
 
 export function PageLoader() {
   return (
@@ -23,6 +24,7 @@ export default function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/discord/callback" element={<DiscordCallback />} />
+          <Route path="/privacy" element={<PrivacyPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Suspense>

@@ -200,6 +200,9 @@ export default function DashboardPage() {
             sign out
           </button>
           <small className="side-email">{session.user.email}</small>
+          <a className="side-privacy" href="/privacy" target="_blank" rel="noreferrer">
+            privacy policy
+          </a>
         </div>
       </aside>
 

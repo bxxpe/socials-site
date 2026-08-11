@@ -53,6 +53,11 @@ export const DEFAULT_CONFIG = {
     show_spotify: true,
     spotify_player: true,
     show_badges: true,
+    // Nitro display-name styling (gradient + font) from display_name_styles
+    use_name_styles: true,
+    name_font_override: 0, // 0 = whatever discord reports
+    styles_on_main_name: false, // also apply to the big name at the top
+    show_guild_tag: true,
   },
 
   socials: [

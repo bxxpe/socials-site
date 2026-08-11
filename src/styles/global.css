@@ -1333,6 +1333,34 @@ input[type="range"]::-moz-range-thumb {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  /* a gradient name needs a paint box for background-clip:text to clip to */
+  display: inline-block;
+  line-height: 1.25;
+}
+.dc-name-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+.guild-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  flex: none;
+  padding: 1px 6px 1px 4px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #e6e3f0;
+}
+.guild-tag img {
+  width: 12px;
+  height: 12px;
+  display: block;
 }
 .dc-head-names span {
   font-size: 0.72rem;

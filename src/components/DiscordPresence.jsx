@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { badgesFrom, badgeUrl } from '../lib/badges'
+import { displayNameStyle, guildTag } from '../lib/discordStyles'
 import {
   activityAssetUrl,
   ACTIVITY_VERBS,
@@ -60,6 +61,12 @@ export default function DiscordPresence({ presence, cfg, style, preview = false 
     ? nameplateUrls(du.collectibles?.nameplate?.asset || dc.nameplate)
     : null
   const badges = dc.show_badges ? badgesFrom(du.public_flags ?? dc.public_flags) : []
+  const nameStyle = displayNameStyle(du.display_name_styles, {
+    useGradient: dc.use_name_styles,
+    useFont: dc.use_name_styles,
+    fontOverride: dc.name_font_override,
+  })
+  const gtag = dc.show_guild_tag ? guildTag(du.primary_guild) : null
 
   let bar = null
   if (spotify?.timestamps?.start && spotify?.timestamps?.end) {
@@ -93,7 +100,15 @@ export default function DiscordPresence({ presence, cfg, style, preview = false 
           <span className="dc-mini-dot" style={{ background: STATUS_COLORS[status] }} />
         </span>
         <div className="dc-head-names">
-          <b>{dName}</b>
+          <span className="dc-name-row">
+            <b style={nameStyle?.css}>{dName}</b>
+            {gtag && (
+              <span className="guild-tag" title="server tag">
+                {gtag.badgeUrl && <img src={gtag.badgeUrl} alt="" draggable="false" />}
+                {gtag.tag}
+              </span>
+            )}
+          </span>
           <span>{STATUS_LABELS[status] || 'offline'}</span>
         </div>
         {badges.length > 0 && (

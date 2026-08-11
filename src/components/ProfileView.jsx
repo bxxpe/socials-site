@@ -8,6 +8,7 @@ import useClock, { useZoneDiff } from '../hooks/useClock'
 import { SocialIcon, platformOf, EyeIcon, PinIcon, ClockIcon } from '../lib/icons'
 import { contrastFor } from '../lib/defaults'
 import { ensureFont, fontOf } from '../lib/fonts'
+import { displayNameStyle } from '../lib/discordStyles'
 import { STATUS_COLORS, STATUS_LABELS, discordAvatarUrl, decorationUrl, customStatus } from '../lib/discord'
 
 /**
@@ -40,6 +41,14 @@ export default function ProfileView({ profile, preview = false, entered = true, 
   const avatarSrc =
     dc.use_discord_avatar && dc.user_id ? discordAvatarUrl(dc.user_id, dcAvatarHash, 256) : cfg.avatar_url
   const cStatus = dc.show_presence ? customStatus(presence) : ''
+  // Optionally carry the Nitro name styling onto the big name at the top.
+  const mainNameStyle =
+    dc.show_presence && dc.styles_on_main_name && dc.use_name_styles
+      ? displayNameStyle(presence?.discord_user?.display_name_styles, {
+          fontOverride: dc.name_font_override,
+        })
+      : null
+
   const clock = useClock(cfg.timezone, cfg.show_time, cfg.time_24h)
   const zoneDiff = useZoneDiff(cfg.timezone, cfg.show_time && cfg.show_time_diff)
   const mainDeco = dc.show_decoration
@@ -112,7 +121,9 @@ export default function ProfileView({ profile, preview = false, entered = true, 
             </span>
           </div>
 
-          <h1 className="name" style={{ '--i': 1 }}>{name}</h1>
+          <h1 className="name" style={{ '--i': 1, ...(mainNameStyle?.css || {}) }}>
+            {name}
+          </h1>
           <p className="handle" style={{ '--i': 2 }}>@{profile.username}</p>
 
           {cStatus && (

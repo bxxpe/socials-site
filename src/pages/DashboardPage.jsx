@@ -7,6 +7,7 @@ import { newId } from '../lib/defaults'
 import { allZones, localZone } from '../hooks/useClock'
 import { FONTS } from '../lib/fonts'
 import { badgesFrom } from '../lib/badges'
+import { displayNameStyle, DISPLAY_FONTS } from '../lib/discordStyles'
 import {
   discordAuthorizeUrl,
   discordAvatarUrl,
@@ -170,6 +171,9 @@ export default function DashboardPage() {
   const checkedUser = dcCheck.state === 'ok' ? dcCheck.data.discord_user : null
   const dcDecoAsset = checkedUser?.avatar_decoration_data?.asset || dc.decoration
   const detectedBadges = badgesFrom(checkedUser?.public_flags ?? dc.public_flags)
+  const liveStyles = displayNameStyle(checkedUser?.display_name_styles, {
+    fontOverride: dc.name_font_override,
+  })
 
   return (
     <div className="dash" style={{ '--accent': cfg.accent }}>
@@ -541,6 +545,49 @@ export default function DashboardPage() {
                 <Toggle label="use discord avatar" hint="your profile picture follows your discord avatar" on={dc.use_discord_avatar} onChange={(v) => patchDc({ use_discord_avatar: v })} />
                 <Toggle label="avatar decoration" hint="your discord decoration frames both avatars (if you own one)" on={dc.show_decoration} onChange={(v) => patchDc({ show_decoration: v })} />
                 <Toggle label="nameplate" hint="your nameplate animates behind the discord card (if you own one)" on={dc.show_nameplate} onChange={(v) => patchDc({ show_nameplate: v })} />
+                <Toggle
+                  label="nitro name styling"
+                  hint={
+                    liveStyles
+                      ? `detected: ${liveStyles.colors.join(' → ')}${liveStyles.fontName ? ` · ${liveStyles.fontName}` : ''}`
+                      : 'gradient + font from your discord display name (nitro only)'
+                  }
+                  on={dc.use_name_styles}
+                  onChange={(v) => patchDc({ use_name_styles: v })}
+                />
+                {dc.use_name_styles && (
+                  <div className="sub-settings">
+                    <Toggle
+                      label="also style the big name"
+                      hint="apply the same gradient + font to the name at the top of your card"
+                      on={dc.styles_on_main_name}
+                      onChange={(v) => patchDc({ styles_on_main_name: v })}
+                    />
+                    <Field
+                      label="font override"
+                      hint="discord doesn't publish its font id list, so the auto-detected face is a best guess — pick manually if it looks wrong"
+                    >
+                      <select
+                        value={dc.name_font_override}
+                        onChange={(e) => patchDc({ name_font_override: Number(e.target.value) })}
+                      >
+                        <option value={0}>auto (from discord)</option>
+                        {Object.entries(DISPLAY_FONTS).map(([id, f]) => (
+                          <option key={id} value={id}>
+                            {f.name}
+                            {f.google ? '' : ' (not on google fonts — falls back)'}
+                          </option>
+                        ))}
+                      </select>
+                    </Field>
+                  </div>
+                )}
+                <Toggle
+                  label="server tag"
+                  hint="the little guild tag next to your name, if you have one"
+                  on={dc.show_guild_tag}
+                  onChange={(v) => patchDc({ show_guild_tag: v })}
+                />
                 <Toggle
                   label="profile badges"
                   hint={

@@ -625,35 +625,6 @@ input[type="range"]::-moz-range-thumb {
 
 /* ---------- enter overlay ---------- */
 
-.enter-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 80;
-  display: grid;
-  place-items: center;
-  cursor: pointer;
-  background: rgba(4, 3, 8, 0.35);
-  transition: opacity 0.65s ease;
-  user-select: none;
-}
-.enter-overlay.leaving {
-  opacity: 0;
-  pointer-events: none;
-}
-.enter-text {
-  font-size: 0.95rem;
-  letter-spacing: 0.42em;
-  text-transform: lowercase;
-  color: #d6d3e2;
-  padding-left: 0.42em; /* optically centre the tracked text */
-  animation: pulse 2.3s ease-in-out infinite;
-}
-@keyframes pulse {
-  50% {
-    opacity: 0.35;
-  }
-}
-
 /* ---------- audio dock ---------- */
 
 .audio-dock {
@@ -1017,6 +988,41 @@ input[type="range"]::-moz-range-thumb {
   text-decoration: underline;
   text-underline-offset: 2px;
 }
+.badge-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+.badge-opt {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 11px 6px 8px;
+  border-radius: 99px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  font-size: 0.76rem;
+  color: var(--muted);
+  transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
+}
+.badge-opt img {
+  width: 16px;
+  height: 16px;
+  opacity: 0.55;
+  transition: opacity 0.15s ease;
+}
+.badge-opt:hover {
+  color: var(--text);
+}
+.badge-opt.on {
+  color: #fff;
+  border-color: color-mix(in srgb, var(--accent) 55%, transparent);
+  background: color-mix(in srgb, var(--accent) 16%, transparent);
+}
+.badge-opt.on img {
+  opacity: 1;
+}
+
 .trail-reset {
   align-self: flex-start;
   margin-top: 8px;
@@ -1396,6 +1402,7 @@ input[type="range"]::-moz-range-thumb {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  font-family: var(--presence-font, var(--font));
 }
 .presence-item {
   display: flex;

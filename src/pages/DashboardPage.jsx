@@ -6,7 +6,7 @@ import { PLATFORMS, platformOf, SocialIcon } from '../lib/icons'
 import { newId } from '../lib/defaults'
 import { allZones, localZone } from '../hooks/useClock'
 import { FONTS } from '../lib/fonts'
-import { badgesFrom } from '../lib/badges'
+import { badgesFrom, badgeUrl, MANUAL_BADGES } from '../lib/badges'
 import { displayNameStyle, DISPLAY_FONTS } from '../lib/discordStyles'
 import {
   discordAuthorizeUrl,
@@ -582,6 +582,22 @@ export default function DashboardPage() {
                     </Field>
                   </div>
                 )}
+                <Field
+                  label="now-playing font"
+                  hint="font for the discord card — spotify, activity, and your discord name"
+                >
+                  <select
+                    value={dc.presence_font}
+                    onChange={(e) => patchDc({ presence_font: e.target.value })}
+                  >
+                    <option value="">same as page font</option>
+                    {FONTS.map((f) => (
+                      <option key={f.id} value={f.id}>
+                        {f.name}
+                      </option>
+                    ))}
+                  </select>
+                </Field>
                 <Toggle
                   label="server tag"
                   hint="the little guild tag next to your name, if you have one"
@@ -598,6 +614,104 @@ export default function DashboardPage() {
                   on={dc.show_badges}
                   onChange={(v) => patchDc({ show_badges: v })}
                 />
+                {dc.show_badges && (
+                  <div className="sub-settings">
+                    <p className="hint" style={{ marginBottom: 10 }}>
+                      auto-detected from your account:{' '}
+                      <b>{detectedBadges.length ? detectedBadges.map((b) => b.name).join(', ') : 'none'}</b>.
+                      nitro and boosting aren't in discord's public data — no site can read them — so
+                      tick them here if you have them.
+                    </p>
+                    <div className="badge-picker">
+                      {MANUAL_BADGES.map((b) => {
+                        const on = (dc.manual_badges || []).includes(b.id)
+                        return (
+                          <button
+                            key={b.id}
+                            type="button"
+                            className={`badge-opt${on ? ' on' : ''}`}
+                            title={b.name}
+                            onClick={() =>
+                              patchDc({
+                                manual_badges: on
+                                  ? dc.manual_badges.filter((x) => x !== b.id)
+                                  : [...(dc.manual_badges || []), b.id],
+                              })
+                            }
+                          >
+                            <img src={badgeUrl(b.hash)} alt="" />
+                            <span>{b.name}</span>
+                          </button>
+                        )
+                      })}
+                    </div>
+
+                    <h3 style={{ marginTop: 20 }}>your own badges</h3>
+                    {(dc.custom_badges || []).map((b) => (
+                      <div className="social-row" key={b.id}>
+                        <span className="social-row-icon">
+                          {b.url ? <img src={b.url} alt="" style={{ width: 17, height: 17 }} /> : '?'}
+                        </span>
+                        <input
+                          value={b.name || ''}
+                          placeholder="label"
+                          style={{ width: 130, flex: 'none' }}
+                          onChange={(e) =>
+                            patchDc({
+                              custom_badges: dc.custom_badges.map((x) =>
+                                x.id === b.id ? { ...x, name: e.target.value } : x
+                              ),
+                            })
+                          }
+                        />
+                        <input
+                          value={b.url || ''}
+                          placeholder="https://…/badge.png"
+                          onChange={(e) =>
+                            patchDc({
+                              custom_badges: dc.custom_badges.map((x) =>
+                                x.id === b.id ? { ...x, url: e.target.value.trim() } : x
+                              ),
+                            })
+                          }
+                        />
+                        <div className="row-btns">
+                          <UploadButton
+                            accept="image/*"
+                            kind="badge"
+                            onDone={(url) =>
+                              patchDc({
+                                custom_badges: dc.custom_badges.map((x) =>
+                                  x.id === b.id ? { ...x, url } : x
+                                ),
+                              })
+                            }
+                            onError={flash}
+                          />
+                          <button
+                            className="mini mini-danger"
+                            aria-label="remove"
+                            onClick={() =>
+                              patchDc({ custom_badges: dc.custom_badges.filter((x) => x.id !== b.id) })
+                            }
+                          >
+                            ×
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                    <button
+                      className="btn btn-ghost"
+                      onClick={() =>
+                        patchDc({
+                          custom_badges: [...(dc.custom_badges || []), { id: newId(), url: '', name: '' }],
+                        })
+                      }
+                    >
+                      + add custom badge
+                    </button>
+                  </div>
+                )}
                 <Toggle label="show current activity" hint="the game or app you're in" on={dc.show_activity} onChange={(v) => patchDc({ show_activity: v })} />
                 <Toggle label="show spotify" hint="song, artist, and a live progress bar" on={dc.show_spotify} onChange={(v) => patchDc({ show_spotify: v })} />
                 <Toggle
@@ -763,15 +877,7 @@ export default function DashboardPage() {
             )}
 
             <h3>Page behaviour</h3>
-            <Field label="enter screen text" hint="leave empty to skip the click-to-enter screen">
-              <input
-                value={cfg.enter_text}
-                onChange={(e) => patchCfg({ enter_text: e.target.value })}
-                placeholder="click to enter"
-                maxLength={40}
-              />
-            </Field>
-            <Field label="background music" hint="upload or paste an mp3 — plays after the visitor clicks enter">
+            <Field label="background music" hint="upload or paste an mp3 — starts on the visitor's first click or keypress (browsers block audio before that)">
               <div className="upload-row">
                 <input
                   value={cfg.audio_url}

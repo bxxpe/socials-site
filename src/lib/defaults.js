@@ -53,11 +53,14 @@ export const DEFAULT_CONFIG = {
     show_spotify: true,
     spotify_player: true,
     show_badges: true,
+    manual_badges: [], // ids from MANUAL_BADGES — nitro/boosting aren't publicly readable
+    custom_badges: [], // [{ id, url, name }] your own images
     // Nitro display-name styling (gradient + font) from display_name_styles
     use_name_styles: true,
     name_font_override: 0, // 0 = whatever discord reports
     styles_on_main_name: false, // also apply to the big name at the top
     show_guild_tag: true,
+    presence_font: '', // '' = inherit the page font
   },
 
   socials: [
@@ -73,6 +76,8 @@ export function mergeConfig(saved) {
   const cfg = { ...DEFAULT_CONFIG, ...(saved || {}) }
   cfg.effects = { ...DEFAULT_CONFIG.effects, ...((saved && saved.effects) || {}) }
   cfg.discord = { ...DEFAULT_CONFIG.discord, ...((saved && saved.discord) || {}) }
+  if (!Array.isArray(cfg.discord.manual_badges)) cfg.discord.manual_badges = []
+  if (!Array.isArray(cfg.discord.custom_badges)) cfg.discord.custom_badges = []
   cfg.socials = Array.isArray(saved?.socials) ? saved.socials : DEFAULT_CONFIG.socials.map((s) => ({ ...s }))
   return cfg
 }

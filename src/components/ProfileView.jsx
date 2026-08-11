@@ -7,7 +7,7 @@ import useLanyard from '../hooks/useLanyard'
 import useClock, { useZoneDiff } from '../hooks/useClock'
 import { SocialIcon, platformOf, EyeIcon, PinIcon, ClockIcon } from '../lib/icons'
 import { contrastFor } from '../lib/defaults'
-import { ensureFont, fontOf } from '../lib/fonts'
+import { resolveFont } from '../lib/fonts'
 import { displayNameStyle } from '../lib/discordStyles'
 import { STATUS_COLORS, STATUS_LABELS, discordAvatarUrl, decorationUrl, customStatus } from '../lib/discord'
 
@@ -55,7 +55,9 @@ export default function ProfileView({ profile, preview = false, entered = true, 
     ? presence?.discord_user?.avatar_decoration_data?.asset || dc.decoration
     : ''
 
-  ensureFont(cfg.font)
+  // "match my discord name font" resolves against the live font_id
+  const discordFontId = presence?.discord_user?.display_name_styles?.font_id
+  const fontStack = resolveFont(cfg.font, discordFontId)
 
   const vars = {
     '--accent': cfg.accent,
@@ -67,7 +69,8 @@ export default function ProfileView({ profile, preview = false, entered = true, 
     '--bg-bright': cfg.bg_brightness,
     // more blur needs more overscan to keep feathered edges off-screen
     '--bg-blur-scale': cfg.bg_blur / 200,
-    '--font': fontOf(cfg.font).stack,
+    '--font': fontStack,
+    '--presence-font': dc.presence_font ? resolveFont(dc.presence_font, discordFontId) : fontStack,
   }
 
   const name = cfg.display_name || profile.username || 'unnamed'

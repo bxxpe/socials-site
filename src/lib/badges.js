@@ -26,6 +26,25 @@ export const BADGES = [
 
 export const badgeUrl = (hash) => `https://cdn.discordapp.com/badge-icons/${hash}.png`
 
+/**
+ * Badges Discord does NOT publish anywhere readable — Nitro lives in
+ * `premium_type` and boosting is per-guild member data, neither of which is
+ * exposed to third parties (Lanyard doesn't carry them either). So these are
+ * opt-in: you tick the ones you actually have and they render alongside the
+ * auto-detected ones. Every hash below was verified against Discord's CDN.
+ */
+export const MANUAL_BADGES = [
+  { id: 'nitro', name: 'Discord Nitro', hash: '2ba85e8026a8614b640c2837bcdfe21b' },
+  { id: 'boost_1mo', name: 'Server Booster (1 month)', hash: '51040c70d4f20a921ad6674ff86fc95c' },
+  { id: 'boost_3mo', name: 'Server Booster (3 months)', hash: '72bed924410c304dbe3d00a6e593ff59' },
+  { id: 'boost_6mo', name: 'Server Booster (6 months)', hash: '991c9f39ee33d7537d9f408c3e53141e' },
+  { id: 'boost_12mo', name: 'Server Booster (12 months)', hash: 'cb3ae83c15e970e8f3d410bc62cb8b99' },
+  { id: 'boost_24mo', name: 'Server Booster (24 months)', hash: 'ec92202290b48d0879b7413d2dde3bab' },
+  { id: 'quest', name: 'Completed a Quest', hash: '7d9ae358c8c5e118768335dbe68b4fb8' },
+]
+
+export const manualBadgeOf = (id) => MANUAL_BADGES.find((b) => b.id === id)
+
 /** Which badges a public_flags bitfield contains. */
 export function badgesFrom(publicFlags) {
   const flags = Number(publicFlags) || 0

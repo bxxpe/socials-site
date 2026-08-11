@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { badgesFrom, badgeUrl } from '../lib/badges'
+import { badgesFrom, badgeUrl, manualBadgeOf } from '../lib/badges'
 import { displayNameStyle, guildTag } from '../lib/discordStyles'
 import {
   activityAssetUrl,
@@ -60,7 +60,23 @@ export default function DiscordPresence({ presence, cfg, style, preview = false 
   const np = dc.show_nameplate
     ? nameplateUrls(du.collectibles?.nameplate?.asset || dc.nameplate)
     : null
-  const badges = dc.show_badges ? badgesFrom(du.public_flags ?? dc.public_flags) : []
+  // auto-detected (public_flags) + manually ticked (nitro/boosting) + your own images
+  const badges = dc.show_badges
+    ? [
+        ...badgesFrom(du.public_flags ?? dc.public_flags).map((b) => ({
+          key: b.id,
+          src: badgeUrl(b.hash),
+          name: b.name,
+        })),
+        ...(dc.manual_badges || [])
+          .map(manualBadgeOf)
+          .filter(Boolean)
+          .map((b) => ({ key: `m-${b.id}`, src: badgeUrl(b.hash), name: b.name })),
+        ...(dc.custom_badges || [])
+          .filter((b) => b.url)
+          .map((b) => ({ key: `c-${b.id}`, src: b.url, name: b.name || 'badge' })),
+      ]
+    : []
   const nameStyle = displayNameStyle(du.display_name_styles, {
     useGradient: dc.use_name_styles,
     useFont: dc.use_name_styles,
@@ -115,9 +131,9 @@ export default function DiscordPresence({ presence, cfg, style, preview = false 
           <div className="dc-badges">
             {badges.map((b) => (
               <img
-                key={b.id}
+                key={b.key}
                 className="dc-badge"
-                src={badgeUrl(b.hash)}
+                src={b.src}
                 alt={b.name}
                 title={b.name}
                 draggable="false"

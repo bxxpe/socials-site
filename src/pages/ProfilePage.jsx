@@ -9,8 +9,9 @@ import { PageLoader } from '../App'
 export default function ProfilePage() {
   const [profile, setProfile] = useState(undefined) // undefined = loading, null = none yet
   const [views, setViews] = useState(null)
-  const [entered, setEntered] = useState(false)
-  const [overlayGone, setOverlayGone] = useState(false)
+  // Browsers only allow audio after a user gesture, so background music waits
+  // for the visitor's first click/keypress instead of a click-to-enter gate.
+  const [interacted, setInteracted] = useState(false)
 
   useEffect(() => {
     let alive = true
@@ -26,11 +27,6 @@ export default function ProfilePage() {
         setViews((p.views || 0) + 1)
       } else {
         setViews(p.views || 0)
-      }
-      // No enter screen configured -> straight in.
-      if (!p.config.enter_text) {
-        setEntered(true)
-        setOverlayGone(true)
       }
     })
     return () => {
@@ -53,11 +49,21 @@ export default function ProfilePage() {
     return () => link.setAttribute('href', previous || '')
   }, [favicon])
 
-  const enter = () => {
-    if (entered) return
-    setEntered(true)
-    setTimeout(() => setOverlayGone(true), 700)
-  }
+  // Arm background music on the first interaction of any kind.
+  const needsAudio = Boolean(profile?.config?.audio_url)
+  useEffect(() => {
+    if (!needsAudio || interacted) return
+    const go = () => setInteracted(true)
+    const opts = { once: true, passive: true }
+    window.addEventListener('pointerdown', go, opts)
+    window.addEventListener('keydown', go, opts)
+    window.addEventListener('scroll', go, opts)
+    return () => {
+      window.removeEventListener('pointerdown', go)
+      window.removeEventListener('keydown', go)
+      window.removeEventListener('scroll', go)
+    }
+  }, [needsAudio, interacted])
 
   if (profile === undefined) return <PageLoader />
 
@@ -83,30 +89,19 @@ export default function ProfilePage() {
 
   return (
     <>
-      <ProfileView profile={profile} entered={entered} views={views} />
+      <ProfileView profile={profile} entered views={views} />
       <CursorTrail
         enabled={profile.config.effects.trail}
         variant={profile.config.trail_style}
         color={profile.config.trail_color || profile.config.accent}
       />
-      <AudioDock src={profile.config.audio_url} volume={profile.config.audio_volume} play={entered} />
+      <AudioDock src={profile.config.audio_url} volume={profile.config.audio_volume} play={interacted} />
       <Link to="/privacy" className="corner-fab fab-left">
         privacy
       </Link>
       <Link to="/terms" className="corner-fab fab-right">
         terms
       </Link>
-      {!overlayGone && (
-        <div
-          className={`enter-overlay${entered ? ' leaving' : ''}`}
-          onClick={enter}
-          role="button"
-          tabIndex={0}
-          onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && enter()}
-        >
-          <span className="enter-text">{profile.config.enter_text}</span>
-        </div>
-      )}
     </>
   )
 }

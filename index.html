@@ -3,10 +3,39 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#060409" />
-    <meta name="description" content="all my links in one place" />
-    <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20100%20100'%3E%3Ccircle%20cx='50'%20cy='50'%20r='38'%20fill='%23a855f7'/%3E%3Ccircle%20cx='50'%20cy='50'%20r='38'%20fill='url(%23g)'/%3E%3C/svg%3E" />
+    <meta name="theme-color" content="#a855f7" />
+
     <title>bxxpe</title>
+    <meta name="description" content="all my links in one place" />
+
+    <!--
+      Link-unfurl cards (Discord, Twitter, iMessage, Slack).
+      These MUST be static: crawlers don't run JavaScript, so anything React
+      sets at runtime is invisible to them. Update these by hand when your
+      avatar or bio changes, then redeploy.
+    -->
+    <meta property="og:type" content="profile" />
+    <meta property="og:site_name" content="bxxpe.dev" />
+    <meta property="og:url" content="https://bxxpe.dev/" />
+    <meta property="og:title" content="bxxpe" />
+    <meta property="og:description" content="fugg yeah" />
+    <meta
+      property="og:image"
+      content="https://gxbotcuzpdxrcdzgaxpy.supabase.co/storage/v1/object/public/media/4c2c013f-4a2f-4bbc-babc-8796952851c9/avatar-1786472595869.jpg"
+    />
+    <meta property="og:image:alt" content="bxxpe" />
+
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="bxxpe" />
+    <meta name="twitter:description" content="fugg yeah" />
+    <meta
+      name="twitter:image"
+      content="https://gxbotcuzpdxrcdzgaxpy.supabase.co/storage/v1/object/public/media/4c2c013f-4a2f-4bbc-babc-8796952851c9/avatar-1786472595869.jpg"
+    />
+
+    <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20100%20100'%3E%3Ccircle%20cx='50'%20cy='50'%20r='38'%20fill='%23a855f7'/%3E%3C/svg%3E" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   </head>
   <body>
     <div id="root"></div>

@@ -13,15 +13,18 @@ create table if not exists public.profiles (
 alter table public.profiles enable row level security;
 
 -- Anyone can view profiles (it's a public link-in-bio page).
+drop policy if exists "public can read profiles" on public.profiles;
 create policy "public can read profiles"
   on public.profiles for select
   using (true);
 
 -- Only the owner can create / edit their own profile.
+drop policy if exists "owner can insert own profile" on public.profiles;
 create policy "owner can insert own profile"
   on public.profiles for insert
   with check (auth.uid() = id);
 
+drop policy if exists "owner can update own profile" on public.profiles;
 create policy "owner can update own profile"
   on public.profiles for update
   using (auth.uid() = id);

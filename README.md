@@ -44,12 +44,15 @@ database; Vercel hosts the site on a global CDN and redeploys on every git push.
 1. Create a free project at [supabase.com](https://supabase.com).
 2. In the project: **SQL Editor → New query**, paste the contents of
    [`supabase/schema.sql`](supabase/schema.sql), hit **Run**.
-3. Go to **Project Settings → API** and copy the `URL` and the `anon public` key.
+3. Copy your **Project URL** (Project Settings → Data API) and your **publishable key**
+   (Project Settings → API Keys → `sb_publishable_...`). On older projects the equivalent is the
+   `anon public` key — either works. The **secret key** (`sb_secret_...`) is never used by this
+   site; keep it out of `.env` and the repo.
 4. Copy `.env.example` to `.env` and fill both values:
 
    ```
    VITE_SUPABASE_URL=https://xxxx.supabase.co
-   VITE_SUPABASE_ANON_KEY=eyJ...
+   VITE_SUPABASE_ANON_KEY=sb_publishable_...
    ```
 
 5. Run the site, open `/login`, and **create your account** — that account owns the page.

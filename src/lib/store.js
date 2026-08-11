@@ -1,7 +1,11 @@
 import { createClient } from '@supabase/supabase-js'
 import { mergeConfig } from './defaults'
 
-const url = import.meta.env.VITE_SUPABASE_URL
+// Tolerate common paste mistakes: trailing slashes or a copied endpoint path
+// like /rest/v1 — supabase-js needs the bare project origin.
+const url = (import.meta.env.VITE_SUPABASE_URL || '')
+  .replace(/\/(rest|auth|storage|realtime|functions)\/v1\/?$/, '')
+  .replace(/\/+$/, '')
 const anon = import.meta.env.VITE_SUPABASE_ANON_KEY
 
 /** True when no Supabase project is configured — everything falls back to localStorage. */

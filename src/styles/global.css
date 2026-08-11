@@ -424,7 +424,7 @@ input[type="range"]::-moz-range-thumb {
 
 .card {
   position: relative;
-  width: min(400px, calc(100vw - 40px));
+  width: min(440px, calc(100vw - 40px));
   padding: 42px 34px 34px;
   border-radius: 26px;
   text-align: center;

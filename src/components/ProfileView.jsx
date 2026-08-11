@@ -23,11 +23,13 @@ export default function ProfileView({ profile, preview = false, entered = true, 
   const typing = fx.typewriter && !preview && !reduced && entered
   const bio = useTypewriter(cfg.bio || '', typing)
 
-  // The typewriter drives the browser tab title too (public page only).
+  // The tab title runs its own loop on the handle, independent of the bio.
+  // The "@" stays put so the tab is never momentarily blank.
+  const typedHandle = useTypewriter(profile.username || '', typing)
   useEffect(() => {
     if (!typing) return
-    document.title = bio || cfg.display_name || profile.username || 'socials'
-  }, [typing, bio, cfg.display_name, profile.username])
+    document.title = `@${typedHandle}`
+  }, [typing, typedHandle])
 
   // Live Discord presence (Lanyard) — also live inside the dashboard preview.
   const presence = useLanyard(dc.user_id, Boolean(dc.show_presence && dc.user_id))

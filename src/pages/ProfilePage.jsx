@@ -55,8 +55,11 @@ export default function ProfilePage() {
             open dashboard
           </Link>
         </div>
-        <Link to="/privacy" className="privacy-fab">
+        <Link to="/privacy" className="corner-fab fab-left">
           privacy
+        </Link>
+        <Link to="/terms" className="corner-fab fab-right">
+          terms
         </Link>
       </div>
     )
@@ -66,8 +69,11 @@ export default function ProfilePage() {
     <>
       <ProfileView profile={profile} entered={entered} views={views} />
       <AudioDock src={profile.config.audio_url} volume={profile.config.audio_volume} play={entered} />
-      <Link to="/privacy" className="privacy-fab">
+      <Link to="/privacy" className="corner-fab fab-left">
         privacy
+      </Link>
+      <Link to="/terms" className="corner-fab fab-right">
+        terms
       </Link>
       {!overlayGone && (
         <div

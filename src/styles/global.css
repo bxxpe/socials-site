@@ -1526,9 +1526,8 @@ input[type="range"]::-moz-range-thumb {
 
 /* ---------- privacy page + entry points ---------- */
 
-.privacy-fab {
+.corner-fab {
   position: fixed;
-  left: 16px;
   bottom: 16px;
   z-index: 85;
   font-size: 0.72rem;
@@ -1542,18 +1541,29 @@ input[type="range"]::-moz-range-thumb {
   -webkit-backdrop-filter: blur(10px);
   transition: color 0.15s ease, border-color 0.15s ease;
 }
-.privacy-fab:hover {
+.corner-fab:hover {
   color: var(--text);
   border-color: color-mix(in srgb, var(--accent) 40%, transparent);
 }
+.fab-left {
+  left: 16px;
+}
+.fab-right {
+  right: 16px;
+}
 
-.side-privacy {
-  text-align: center;
+.side-legal {
+  display: flex;
+  justify-content: center;
+  gap: 7px;
   font-size: 0.72rem;
+  color: #3d3949;
+}
+.side-legal a {
   color: #565064;
   transition: color 0.15s ease;
 }
-.side-privacy:hover {
+.side-legal a:hover {
   color: var(--muted);
 }
 
@@ -1610,6 +1620,11 @@ input[type="range"]::-moz-range-thumb {
   display: flex;
   flex-direction: column;
   gap: 8px;
+}
+.legal p a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
 
 /* ---------- responsive ---------- */

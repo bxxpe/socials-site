@@ -76,7 +76,7 @@ export default function PrivacyPage() {
         <h2>contact &amp; removal</h2>
         <p>
           questions, or want something taken down? reach out through any of the links on the main
-          page.
+          page. see also the <Link to="/terms">terms of service</Link>.
         </p>
       </div>
     </div>

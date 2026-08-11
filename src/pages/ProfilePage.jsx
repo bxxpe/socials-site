@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import ProfileView from '../components/ProfileView'
 import AudioDock from '../components/AudioDock'
+import CursorTrail from '../components/CursorTrail'
 import { fetchPublicProfile, incrementViews } from '../lib/store'
 import { PageLoader } from '../App'
 
@@ -83,6 +84,11 @@ export default function ProfilePage() {
   return (
     <>
       <ProfileView profile={profile} entered={entered} views={views} />
+      <CursorTrail
+        enabled={profile.config.effects.trail}
+        variant={profile.config.trail_style}
+        color={profile.config.trail_color || profile.config.accent}
+      />
       <AudioDock src={profile.config.audio_url} volume={profile.config.audio_volume} play={entered} />
       <Link to="/privacy" className="corner-fab fab-left">
         privacy

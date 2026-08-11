@@ -43,6 +43,7 @@ export default function DiscordCallback() {
           avatar: user.avatar || '',
           decoration: user.avatar_decoration_data?.asset || '',
           nameplate: user.collectibles?.nameplate?.asset || '',
+          public_flags: user.public_flags ?? 0,
           show_presence: true,
         }
         await saveProfile(profile)

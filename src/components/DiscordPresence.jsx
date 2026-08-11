@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { badgesFrom, badgeUrl } from '../lib/badges'
 import {
   activityAssetUrl,
   ACTIVITY_VERBS,
@@ -58,6 +59,7 @@ export default function DiscordPresence({ presence, cfg, style, preview = false 
   const np = dc.show_nameplate
     ? nameplateUrls(du.collectibles?.nameplate?.asset || dc.nameplate)
     : null
+  const badges = dc.show_badges ? badgesFrom(du.public_flags ?? dc.public_flags) : []
 
   let bar = null
   if (spotify?.timestamps?.start && spotify?.timestamps?.end) {
@@ -94,6 +96,21 @@ export default function DiscordPresence({ presence, cfg, style, preview = false 
           <b>{dName}</b>
           <span>{STATUS_LABELS[status] || 'offline'}</span>
         </div>
+        {badges.length > 0 && (
+          <div className="dc-badges">
+            {badges.map((b) => (
+              <img
+                key={b.id}
+                className="dc-badge"
+                src={badgeUrl(b.hash)}
+                alt={b.name}
+                title={b.name}
+                draggable="false"
+                onError={(e) => (e.currentTarget.style.display = 'none')}
+              />
+            ))}
+          </div>
+        )}
       </div>
 
       {spotify && (

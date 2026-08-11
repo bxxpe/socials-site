@@ -1,0 +1,34 @@
+/**
+ * Discord profile badges, decoded from the `public_flags` bitfield that
+ * Lanyard and the OAuth /users/@me response both expose.
+ *
+ * Only badges that live in public_flags can appear here. Nitro and server
+ * boosting are deliberately absent — Discord keeps those in `premium_type`
+ * and per-guild data, neither of which is publicly readable, so no site can
+ * show them from presence alone.
+ *
+ * Every hash below was verified to resolve on Discord's CDN.
+ */
+export const BADGES = [
+  { bit: 0, id: 'staff', name: 'Discord Staff', hash: '5e74e9b61934fc1f67c65515d1f7e60d' },
+  { bit: 1, id: 'partner', name: 'Partnered Server Owner', hash: '3f9748e53446a137a052f3454e2de41e' },
+  { bit: 2, id: 'hypesquad', name: 'HypeSquad Events', hash: 'bf01d1073931f921909045f3a39fd264' },
+  { bit: 3, id: 'bug_hunter_1', name: 'Bug Hunter', hash: '2717692c7dca7289b35297368a940dd0' },
+  { bit: 6, id: 'bravery', name: 'HypeSquad Bravery', hash: '8a88d63823d8a71cd5e390baa45efa02' },
+  { bit: 7, id: 'brilliance', name: 'HypeSquad Brilliance', hash: '011940fd013da3f7fb926e4a1cd2e618' },
+  { bit: 8, id: 'balance', name: 'HypeSquad Balance', hash: '3aa41de486fa12454c3761e8e223442e' },
+  { bit: 9, id: 'early_supporter', name: 'Early Supporter', hash: '7060786766c9c840eb3019e725d2b358' },
+  { bit: 14, id: 'bug_hunter_2', name: 'Bug Hunter Gold', hash: '848f79194d4be5ff5f81505cbd0ce1e6' },
+  { bit: 17, id: 'verified_dev', name: 'Early Verified Bot Developer', hash: '6df5892e0f35b051f8b61eace34f4967' },
+  { bit: 18, id: 'mod_alumni', name: 'Moderator Programs Alumni', hash: 'fee1624003e2fee35cb398e125dc479b' },
+  { bit: 22, id: 'active_dev', name: 'Active Developer', hash: '6bdc42827a38498929a4920da12695d9' },
+]
+
+export const badgeUrl = (hash) => `https://cdn.discordapp.com/badge-icons/${hash}.png`
+
+/** Which badges a public_flags bitfield contains. */
+export function badgesFrom(publicFlags) {
+  const flags = Number(publicFlags) || 0
+  if (!flags) return []
+  return BADGES.filter((b) => (flags & (1 << b.bit)) !== 0)
+}

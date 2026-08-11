@@ -7,6 +7,7 @@ import useLanyard from '../hooks/useLanyard'
 import useClock, { useZoneDiff } from '../hooks/useClock'
 import { SocialIcon, platformOf, EyeIcon, PinIcon, ClockIcon } from '../lib/icons'
 import { contrastFor } from '../lib/defaults'
+import { ensureFont, fontOf } from '../lib/fonts'
 import { STATUS_COLORS, STATUS_LABELS, discordAvatarUrl, decorationUrl, customStatus } from '../lib/discord'
 
 /**
@@ -45,12 +46,19 @@ export default function ProfileView({ profile, preview = false, entered = true, 
     ? presence?.discord_user?.avatar_decoration_data?.asset || dc.decoration
     : ''
 
+  ensureFont(cfg.font)
+
   const vars = {
     '--accent': cfg.accent,
     '--accent-contrast': contrastFor(cfg.accent),
     '--bg': cfg.bg_color,
     '--card-alpha': cfg.card_opacity,
     '--card-blur': `${cfg.card_blur}px`,
+    '--bg-blur': `${cfg.bg_blur}px`,
+    '--bg-bright': cfg.bg_brightness,
+    // more blur needs more overscan to keep feathered edges off-screen
+    '--bg-blur-scale': cfg.bg_blur / 200,
+    '--font': fontOf(cfg.font).stack,
   }
 
   const name = cfg.display_name || profile.username || 'unnamed'

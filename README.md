@@ -26,9 +26,14 @@ Live at **[bxxpe.dev](https://bxxpe.dev)**.
   licensing. The embed is the sanctioned way to let visitors hear what you're playing.)
 - **Uploads** — avatar, background, and music upload straight from your machine to Supabase
   Storage. Backgrounds accept images, GIFs, and **videos** (mp4/webm, rendered as a muted loop).
-- **Customization** — accent color (presets + custom), background color/image/video, card opacity
+- **Customization** — accent color (presets + custom), background color/image/video with blur and
+  brightness sliders, 8 fonts (system + Google Fonts, loaded with `display=swap`), card opacity
   and blur, mono or brand-colored icons, toggle every effect, enter-screen text, live preview
   while you edit.
+- **Cursor trail** — three styles (glow, comet, sparkle) in your accent or a custom color. Canvas
+  only, self-stops when idle, off on touch and reduced-motion.
+- **Discord badges** — public profile badges (HypeSquad, Active Developer, Early Supporter…)
+  decoded from `public_flags`. Nitro and boosting aren't in public data, so no site can show them.
 - **Local time** — an optional live clock on your card showing *your* timezone (not the
   visitor's), with a full IANA timezone picker, a "use mine" detect button, and 12/24-hour choice.
   It also tells each visitor how far ahead or behind they are ("you're 3h ahead"), computed from

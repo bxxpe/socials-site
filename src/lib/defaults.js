@@ -13,6 +13,9 @@ export const DEFAULT_CONFIG = {
   accent: '#a855f7',
   bg_color: '#060409',
   bg_image_url: '',
+  bg_blur: 0,
+  bg_brightness: 0.55,
+  font: 'system',
   card_opacity: 0.55,
   card_blur: 24,
   icon_style: 'mono', // 'mono' | 'brand'
@@ -29,7 +32,11 @@ export const DEFAULT_CONFIG = {
     tilt: true,
     sheen: true,
     typewriter: true,
+    trail: true,
   },
+
+  trail_style: 'glow', // 'glow' | 'comet' | 'sparkle'
+  trail_color: '', // empty = follow the accent colour
 
   discord: {
     user_id: '',
@@ -37,6 +44,7 @@ export const DEFAULT_CONFIG = {
     avatar: '', // avatar hash captured at connect time (fallback if lanyard is down)
     decoration: '', // avatar decoration asset, captured at connect time
     nameplate: '', // nameplate collectible asset path, captured at connect time
+    public_flags: 0, // badge bitfield, captured at connect time
     show_presence: true,
     use_discord_avatar: false,
     show_decoration: true,
@@ -44,6 +52,7 @@ export const DEFAULT_CONFIG = {
     show_activity: true,
     show_spotify: true,
     spotify_player: true,
+    show_badges: true,
   },
 
   socials: [

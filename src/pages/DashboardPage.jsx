@@ -5,6 +5,8 @@ import { Field, Toggle, Segmented, Slider, AccentPicker, CopyRow, UploadButton }
 import { PLATFORMS, platformOf, SocialIcon } from '../lib/icons'
 import { newId } from '../lib/defaults'
 import { allZones, localZone } from '../hooks/useClock'
+import { FONTS } from '../lib/fonts'
+import { badgesFrom } from '../lib/badges'
 import {
   discordAuthorizeUrl,
   discordAvatarUrl,
@@ -167,6 +169,7 @@ export default function DashboardPage() {
   const checkedActivity = dcCheck.state === 'ok' ? pickActivity(dcCheck.data) : null
   const checkedUser = dcCheck.state === 'ok' ? dcCheck.data.discord_user : null
   const dcDecoAsset = checkedUser?.avatar_decoration_data?.asset || dc.decoration
+  const detectedBadges = badgesFrom(checkedUser?.public_flags ?? dc.public_flags)
 
   return (
     <div className="dash" style={{ '--accent': cfg.accent }}>
@@ -538,6 +541,16 @@ export default function DashboardPage() {
                 <Toggle label="use discord avatar" hint="your profile picture follows your discord avatar" on={dc.use_discord_avatar} onChange={(v) => patchDc({ use_discord_avatar: v })} />
                 <Toggle label="avatar decoration" hint="your discord decoration frames both avatars (if you own one)" on={dc.show_decoration} onChange={(v) => patchDc({ show_decoration: v })} />
                 <Toggle label="nameplate" hint="your nameplate animates behind the discord card (if you own one)" on={dc.show_nameplate} onChange={(v) => patchDc({ show_nameplate: v })} />
+                <Toggle
+                  label="profile badges"
+                  hint={
+                    detectedBadges.length
+                      ? `detected: ${detectedBadges.map((b) => b.name).join(', ')}`
+                      : "discord's public badges (hypesquad, active developer…). nitro and boosting aren't public, so they can't be shown"
+                  }
+                  on={dc.show_badges}
+                  onChange={(v) => patchDc({ show_badges: v })}
+                />
                 <Toggle label="show current activity" hint="the game or app you're in" on={dc.show_activity} onChange={(v) => patchDc({ show_activity: v })} />
                 <Toggle label="show spotify" hint="song, artist, and a live progress bar" on={dc.show_spotify} onChange={(v) => patchDc({ show_spotify: v })} />
                 <Toggle
@@ -600,6 +613,42 @@ export default function DashboardPage() {
               </div>
             </Field>
 
+            {cfg.bg_image_url && (
+              <div className="sub-settings">
+                <Slider
+                  label="background blur"
+                  value={cfg.bg_blur}
+                  min={0}
+                  max={40}
+                  step={1}
+                  onChange={(bg_blur) => patchCfg({ bg_blur })}
+                  format={(v) => `${v}px`}
+                />
+                <Slider
+                  label="background brightness"
+                  value={cfg.bg_brightness}
+                  min={0.1}
+                  max={1.5}
+                  step={0.05}
+                  onChange={(bg_brightness) => patchCfg({ bg_brightness })}
+                  format={(v) => `${Math.round(v * 100)}%`}
+                />
+                <p className="hint">
+                  dimmer backgrounds keep your text readable — around 55% is a safe default.
+                </p>
+              </div>
+            )}
+
+            <Field label="font" hint="applies to your whole page">
+              <select value={cfg.font} onChange={(e) => patchCfg({ font: e.target.value })}>
+                {FONTS.map((f) => (
+                  <option key={f.id} value={f.id}>
+                    {f.name}
+                  </option>
+                ))}
+              </select>
+            </Field>
+
             <Slider
               label="card opacity"
               value={cfg.card_opacity}
@@ -625,6 +674,46 @@ export default function DashboardPage() {
             <Toggle label="3d tilt" hint="card follows the cursor" on={cfg.effects.tilt} onChange={(v) => patchFx({ tilt: v })} />
             <Toggle label="sheen" hint="light reflection on the card" on={cfg.effects.sheen} onChange={(v) => patchFx({ sheen: v })} />
             <Toggle label="typewriter bio" hint="bio types itself out" on={cfg.effects.typewriter} onChange={(v) => patchFx({ typewriter: v })} />
+            <Toggle label="cursor trail" hint="follows the mouse (desktop only)" on={cfg.effects.trail} onChange={(v) => patchFx({ trail: v })} />
+
+            {cfg.effects.trail && (
+              <div className="sub-settings">
+                <Field label="trail style">
+                  <Segmented
+                    value={cfg.trail_style}
+                    onChange={(trail_style) => patchCfg({ trail_style })}
+                    options={[
+                      { value: 'glow', label: 'glow' },
+                      { value: 'comet', label: 'comet' },
+                      { value: 'sparkle', label: 'sparkle' },
+                    ]}
+                  />
+                </Field>
+                <div className="field">
+                  <span>trail colour</span>
+                  <AccentPicker
+                    value={cfg.trail_color || cfg.accent}
+                    onChange={(trail_color) => patchCfg({ trail_color })}
+                  />
+                  {cfg.trail_color && (
+                    <button
+                      type="button"
+                      className="linkish trail-reset"
+                      onClick={() => patchCfg({ trail_color: '' })}
+                    >
+                      match accent colour
+                    </button>
+                  )}
+                </div>
+                <p className="hint">
+                  trails don't show in this preview — open{' '}
+                  <a href="/" target="_blank" rel="noreferrer">
+                    your page
+                  </a>{' '}
+                  to try it.
+                </p>
+              </div>
+            )}
 
             <h3>Page behaviour</h3>
             <Field label="enter screen text" hint="leave empty to skip the click-to-enter screen">

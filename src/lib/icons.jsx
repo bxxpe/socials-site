@@ -113,6 +113,13 @@ export const EyeIcon = stroke(
   </>
 )
 
+export const ClockIcon = stroke(
+  <>
+    <circle cx="12" cy="12" r="9" />
+    <path d="M12 7v5.2l3.2 1.9" />
+  </>
+)
+
 export const PinIcon = stroke(
   <>
     <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />

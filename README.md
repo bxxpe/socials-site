@@ -19,11 +19,21 @@ Live at **[bxxpe.dev](https://bxxpe.dev)**.
   live progress bar). Your **avatar decoration** frames both avatars and your **nameplate**
   animates behind the Discord card if you own them. Optionally use your Discord avatar as your
   profile picture.
+- **Spotify player** — when you're listening, the page embeds Spotify's official player for the
+  exact track and follows along as you change songs. Visitors press play themselves: full track if
+  they're signed into Spotify, preview otherwise. (Spotify audio **cannot** be rebroadcast from
+  your session — no API exposes the stream, and relaying it would break Spotify's terms and music
+  licensing. The embed is the sanctioned way to let visitors hear what you're playing.)
 - **Uploads** — avatar, background, and music upload straight from your machine to Supabase
   Storage. Backgrounds accept images, GIFs, and **videos** (mp4/webm, rendered as a muted loop).
 - **Customization** — accent color (presets + custom), background color/image/video, card opacity
   and blur, mono or brand-colored icons, toggle every effect, enter-screen text, live preview
   while you edit.
+- **Local time** — an optional live clock on your card showing *your* timezone (not the
+  visitor's), with a full IANA timezone picker, a "use mine" detect button, and 12/24-hour choice.
+  It also tells each visitor how far ahead or behind they are ("you're 3h ahead"), computed from
+  their own timezone and correct for DST and half-hour zones like India (+5:30) and Nepal (+5:45).
+- **Custom tab icon** — upload or link a favicon that replaces the browser-tab icon on your page.
 - **Legal pages** — `/privacy` and `/terms`, linked from the bottom-left and bottom-right corners
   of the page and from the dashboard sidebar.
 - **Fast on purpose** — animations only use GPU-composited `transform`/`opacity`, particles render

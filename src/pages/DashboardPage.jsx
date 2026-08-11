@@ -4,6 +4,7 @@ import ProfileView from '../components/ProfileView'
 import { Field, Toggle, Segmented, Slider, AccentPicker, CopyRow, UploadButton } from '../components/ui'
 import { PLATFORMS, platformOf, SocialIcon } from '../lib/icons'
 import { newId } from '../lib/defaults'
+import { allZones, localZone } from '../hooks/useClock'
 import {
   discordAuthorizeUrl,
   discordAvatarUrl,
@@ -26,6 +27,9 @@ const TABS = [
 ]
 
 const stripVolatile = ({ views, fresh, ...rest }) => rest
+
+// Built once — the browser's full IANA list is a few hundred entries.
+const ZONES = allZones()
 
 export default function DashboardPage() {
   const location = useLocation()
@@ -263,6 +267,33 @@ export default function DashboardPage() {
                 />
               </div>
             </Field>
+            <Field
+              label="tab icon"
+              hint="the little icon in the browser tab — square png or gif works best (32×32 or 64×64)"
+            >
+              <div className="upload-row">
+                <input
+                  value={cfg.favicon_url}
+                  onChange={(e) => patchCfg({ favicon_url: e.target.value.trim() })}
+                  placeholder="https://…/icon.png"
+                />
+                {cfg.favicon_url && (
+                  <img
+                    className="favicon-preview"
+                    src={cfg.favicon_url}
+                    alt=""
+                    onError={(e) => (e.currentTarget.style.visibility = 'hidden')}
+                    onLoad={(e) => (e.currentTarget.style.visibility = 'visible')}
+                  />
+                )}
+                <UploadButton
+                  accept="image/png,image/gif,image/jpeg,image/svg+xml,image/x-icon,image/webp"
+                  kind="favicon"
+                  onDone={(url) => patchCfg({ favicon_url: url })}
+                  onError={flash}
+                />
+              </div>
+            </Field>
             <Field label="location" hint="optional">
               <input
                 value={cfg.location}
@@ -271,6 +302,56 @@ export default function DashboardPage() {
                 maxLength={40}
               />
             </Field>
+
+            <Toggle
+              label="show my local time"
+              hint="a live clock on your card, in your timezone — visitors see your time, not theirs"
+              on={cfg.show_time}
+              onChange={(v) =>
+                // Default to the timezone of whatever machine turned this on,
+                // otherwise the clock would show each visitor their own time.
+                patchCfg({ show_time: v, timezone: v && !cfg.timezone ? localZone() : cfg.timezone })
+              }
+            />
+            {cfg.show_time && (
+              <>
+                <Field label="timezone">
+                  <div className="upload-row">
+                    <select
+                      value={cfg.timezone || localZone()}
+                      onChange={(e) => patchCfg({ timezone: e.target.value })}
+                    >
+                      {(ZONES.includes(cfg.timezone || localZone())
+                        ? ZONES
+                        : [cfg.timezone || localZone(), ...ZONES]
+                      ).map((z) => (
+                        <option key={z} value={z}>
+                          {z.replace(/_/g, ' ')}
+                        </option>
+                      ))}
+                    </select>
+                    <button
+                      type="button"
+                      className="btn btn-ghost"
+                      onClick={() => patchCfg({ timezone: localZone() })}
+                    >
+                      use mine
+                    </button>
+                  </div>
+                </Field>
+                <Toggle
+                  label="24-hour clock"
+                  on={cfg.time_24h}
+                  onChange={(v) => patchCfg({ time_24h: v })}
+                />
+                <Toggle
+                  label="show how far ahead/behind visitors are"
+                  hint="adds “you're 3h ahead” next to your clock, worked out from each visitor's own timezone"
+                  on={cfg.show_time_diff}
+                  onChange={(v) => patchCfg({ show_time_diff: v })}
+                />
+              </>
+            )}
           </section>
         )}
 
@@ -459,6 +540,12 @@ export default function DashboardPage() {
                 <Toggle label="nameplate" hint="your nameplate animates behind the discord card (if you own one)" on={dc.show_nameplate} onChange={(v) => patchDc({ show_nameplate: v })} />
                 <Toggle label="show current activity" hint="the game or app you're in" on={dc.show_activity} onChange={(v) => patchDc({ show_activity: v })} />
                 <Toggle label="show spotify" hint="song, artist, and a live progress bar" on={dc.show_spotify} onChange={(v) => patchDc({ show_spotify: v })} />
+                <Toggle
+                  label="spotify player"
+                  hint="official spotify player for the song you're on — visitors press play to hear it, and it follows along when you change tracks"
+                  on={dc.spotify_player}
+                  onChange={(v) => patchDc({ spotify_player: v })}
+                />
               </>
             )}
           </section>

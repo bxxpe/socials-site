@@ -35,7 +35,7 @@ function Nameplate({ urls }) {
  * discord avatar (decoration + status dot) and name over your nameplate,
  * then "listening to spotify" / current-activity panels underneath.
  */
-export default function DiscordPresence({ presence, cfg, style }) {
+export default function DiscordPresence({ presence, cfg, style, preview = false }) {
   const dc = cfg.discord
   const spotify = dc.show_spotify && presence?.listening_to_spotify ? presence.spotify : null
   const activity = dc.show_activity ? pickActivity(presence) : null
@@ -120,6 +120,29 @@ export default function DiscordPresence({ presence, cfg, style }) {
             )}
           </div>
         </div>
+      )}
+
+      {/*
+        Spotify's official embed for whatever is playing right now. Visitors
+        press play themselves — full track if they're signed into Spotify,
+        preview otherwise. Keyed on the track so a song change swaps cleanly.
+        Skipped in the dashboard preview: a third-party iframe remounting on
+        every keystroke would make editing crawl.
+      */}
+      {dc.spotify_player && spotify?.track_id && (
+        preview ? (
+          <div className="spotify-embed-stub">▶ spotify player (live on your page)</div>
+        ) : (
+          <iframe
+            key={spotify.track_id}
+            className="spotify-embed"
+            title="spotify player"
+            src={`https://open.spotify.com/embed/track/${spotify.track_id}?utm_source=generator&theme=0`}
+            height="80"
+            loading="lazy"
+            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+          />
+        )
       )}
 
       {activity && (

@@ -37,6 +37,21 @@ export default function ProfilePage() {
     }
   }, [])
 
+  // Swap the browser tab icon to the owner's, restoring the default on unmount.
+  const favicon = profile?.config?.favicon_url
+  useEffect(() => {
+    if (!favicon) return
+    let link = document.querySelector("link[rel~='icon']")
+    if (!link) {
+      link = document.createElement('link')
+      link.rel = 'icon'
+      document.head.appendChild(link)
+    }
+    const previous = link.getAttribute('href')
+    link.setAttribute('href', favicon)
+    return () => link.setAttribute('href', previous || '')
+  }, [favicon])
+
   const enter = () => {
     if (entered) return
     setEntered(true)

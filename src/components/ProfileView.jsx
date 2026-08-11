@@ -4,7 +4,8 @@ import DiscordPresence from './DiscordPresence'
 import useTilt from '../hooks/useTilt'
 import useTypewriter from '../hooks/useTypewriter'
 import useLanyard from '../hooks/useLanyard'
-import { SocialIcon, platformOf, EyeIcon, PinIcon } from '../lib/icons'
+import useClock, { useZoneDiff } from '../hooks/useClock'
+import { SocialIcon, platformOf, EyeIcon, PinIcon, ClockIcon } from '../lib/icons'
 import { contrastFor } from '../lib/defaults'
 import { STATUS_COLORS, STATUS_LABELS, discordAvatarUrl, decorationUrl, customStatus } from '../lib/discord'
 
@@ -38,6 +39,8 @@ export default function ProfileView({ profile, preview = false, entered = true, 
   const avatarSrc =
     dc.use_discord_avatar && dc.user_id ? discordAvatarUrl(dc.user_id, dcAvatarHash, 256) : cfg.avatar_url
   const cStatus = dc.show_presence ? customStatus(presence) : ''
+  const clock = useClock(cfg.timezone, cfg.show_time, cfg.time_24h)
+  const zoneDiff = useZoneDiff(cfg.timezone, cfg.show_time && cfg.show_time_diff)
   const mainDeco = dc.show_decoration
     ? presence?.discord_user?.avatar_decoration_data?.asset || dc.decoration
     : ''
@@ -117,11 +120,22 @@ export default function ProfileView({ profile, preview = false, entered = true, 
             </p>
           )}
 
-          {cfg.location && (
-            <p className="loc" style={{ '--i': 5 }}>
-              <span className="loc-icon">{PinIcon}</span>
-              {cfg.location}
-            </p>
+          {(cfg.location || clock) && (
+            <div className="meta-row" style={{ '--i': 5 }}>
+              {cfg.location && (
+                <span className="meta-chip">
+                  <span className="meta-icon">{PinIcon}</span>
+                  {cfg.location}
+                </span>
+              )}
+              {clock && (
+                <span className="meta-chip" title={cfg.timezone || 'my local time'}>
+                  <span className="meta-icon">{ClockIcon}</span>
+                  <span className="clock-time">{clock}</span>
+                  {zoneDiff && <span className="clock-diff">{zoneDiff}</span>}
+                </span>
+              )}
+            </div>
           )}
 
           {cfg.socials.length > 0 && (
@@ -143,7 +157,9 @@ export default function ProfileView({ profile, preview = false, entered = true, 
             </div>
           )}
 
-          {dc.show_presence && <DiscordPresence presence={presence} cfg={cfg} style={{ '--i': 7 }} />}
+          {dc.show_presence && (
+            <DiscordPresence presence={presence} cfg={cfg} preview={preview} style={{ '--i': 7 }} />
+          )}
 
           {cfg.show_views && views != null && (
             <div className="views" style={{ '--i': 8 }} title="profile views">

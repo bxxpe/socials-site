@@ -2,7 +2,12 @@ export const DEFAULT_CONFIG = {
   display_name: 'bxxpe',
   bio: 'welcome to my corner of the internet',
   avatar_url: '',
+  favicon_url: '',
   location: '',
+  show_time: false,
+  show_time_diff: true,
+  timezone: '',
+  time_24h: false,
 
   // appearance
   accent: '#a855f7',
@@ -38,6 +43,7 @@ export const DEFAULT_CONFIG = {
     show_nameplate: true,
     show_activity: true,
     show_spotify: true,
+    spotify_player: true,
   },
 
   socials: [

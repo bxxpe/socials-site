@@ -7,6 +7,7 @@ import { newId } from '../lib/defaults'
 import { allZones, localZone } from '../hooks/useClock'
 import { FONTS } from '../lib/fonts'
 import { THEMES } from '../lib/themes'
+import { CURSOR_THEMES, cursorThemeOf } from '../lib/cursors'
 import { badgesFrom, badgeUrl, MANUAL_BADGES } from '../lib/badges'
 import { displayNameStyle, DISPLAY_FONTS } from '../lib/discordStyles'
 import {
@@ -881,21 +882,46 @@ export default function DashboardPage() {
               </Field>
             </div>
 
-            <Field label="custom cursor" hint="small square png or gif (32×32 works best) — max 128px or browsers ignore it">
+            <Field label="cursor set" hint="a full themed set — normal, link, help and loading cursors, animated">
               <div className="upload-row">
-                <input
-                  value={cfg.cursor_url}
-                  onChange={(e) => patchCfg({ cursor_url: e.target.value.trim() })}
-                  placeholder="https://…/cursor.png"
-                />
-                <UploadButton
-                  accept="image/png,image/gif,image/webp,image/svg+xml"
-                  kind="cursor"
-                  onDone={(url) => patchCfg({ cursor_url: url })}
-                  onError={flash}
-                />
+                <select
+                  value={cfg.cursor_theme}
+                  onChange={(e) => patchCfg({ cursor_theme: e.target.value })}
+                >
+                  {CURSOR_THEMES.map((t) => (
+                    <option key={t.id} value={t.id}>
+                      {t.name}
+                    </option>
+                  ))}
+                </select>
+                {cursorThemeOf(cfg.cursor_theme)?.preview && (
+                  <img
+                    className="favicon-preview"
+                    src={cursorThemeOf(cfg.cursor_theme).preview}
+                    alt=""
+                    style={{ imageRendering: 'pixelated' }}
+                  />
+                )}
               </div>
             </Field>
+
+            {cfg.cursor_theme === 'none' && (
+              <Field label="single custom cursor" hint="a plain image instead of a full set — 32×32 png or gif works best">
+                <div className="upload-row">
+                  <input
+                    value={cfg.cursor_url}
+                    onChange={(e) => patchCfg({ cursor_url: e.target.value.trim() })}
+                    placeholder="https://…/cursor.png"
+                  />
+                  <UploadButton
+                    accept="image/png,image/gif,image/webp,image/svg+xml"
+                    kind="cursor"
+                    onDone={(url) => patchCfg({ cursor_url: url })}
+                    onError={flash}
+                  />
+                </div>
+              </Field>
+            )}
 
             <h3>Effects</h3>
             <Toggle label="particles" hint="animated background field" on={cfg.effects.particles} onChange={(v) => patchFx({ particles: v })} />

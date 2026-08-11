@@ -42,7 +42,8 @@ export const DEFAULT_CONFIG = {
   card_border: 'none', // 'none' | 'glow' | 'gradient' | 'beam'
   entrance: 'rise', // 'rise' | 'fade' | 'zoom' | 'flip' | 'blur' | 'glitch'
   particle_style: 'dust', // 'dust' | 'snow' | 'rain' | 'matrix'
-  cursor_url: '', // custom cursor image
+  cursor_theme: 'teto', // full cursor set (normal/link/help/wait), animated
+  cursor_url: '', // single custom cursor image; only used when no theme is set
 
   trail_style: 'glow', // 'glow' | 'comet' | 'sparkle'
   trail_color: '', // empty = follow the accent colour

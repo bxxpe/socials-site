@@ -1871,6 +1871,30 @@ input[type="range"]::-moz-range-thumb {
   font-size: 0.9rem;
 }
 
+/* ---------- cursor themes ---------- */
+/* The custom properties are written by CursorTheme.jsx; the fallbacks keep
+   normal cursors if the images ever fail to load. */
+
+body.has-cursor-theme,
+body.has-cursor-theme .profile-root {
+  cursor: var(--cur-normal, auto);
+}
+body.has-cursor-theme a,
+body.has-cursor-theme button,
+body.has-cursor-theme [role="button"],
+body.has-cursor-theme label,
+body.has-cursor-theme input,
+body.has-cursor-theme select {
+  cursor: var(--cur-link, pointer);
+}
+/* higher specificity than the plain `a` rule above, so these keep the help cursor */
+body.has-cursor-theme a.corner-fab {
+  cursor: var(--cur-help, help);
+}
+body.has-cursor-theme .page-loading {
+  cursor: var(--cur-wait, progress);
+}
+
 /* ---------- privacy page + entry points ---------- */
 
 .corner-fab {

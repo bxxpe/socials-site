@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import ProfileView from '../components/ProfileView'
 import AudioDock from '../components/AudioDock'
 import CursorTrail from '../components/CursorTrail'
+import CursorTheme from '../components/CursorTheme'
 import { fetchPublicProfile, incrementViews } from '../lib/store'
 import { PageLoader } from '../App'
 
@@ -90,6 +91,7 @@ export default function ProfilePage() {
   return (
     <>
       <ProfileView profile={profile} entered views={views} />
+      <CursorTheme theme={profile.config.cursor_theme} />
       <CursorTrail
         enabled={profile.config.effects.trail}
         variant={profile.config.trail_style}

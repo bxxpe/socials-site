@@ -72,7 +72,8 @@ export default function ProfileView({ profile, preview = false, entered = true, 
     '--font': fontStack,
     '--presence-font': dc.presence_font ? resolveFont(dc.presence_font, discordFontId) : fontStack,
     '--reflect': cfg.reflect_intensity,
-    ...(cfg.cursor_url && !preview
+    // a full cursor theme wins over a single custom image
+    ...(cfg.cursor_url && cfg.cursor_theme === 'none' && !preview
       ? { cursor: `url(${JSON.stringify(cfg.cursor_url)}) 4 4, auto` }
       : null),
   }

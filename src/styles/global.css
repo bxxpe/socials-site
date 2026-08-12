@@ -1943,6 +1943,44 @@ input[type="range"]::-moz-range-thumb {
     radial-gradient(ellipse at center, transparent 52%, rgba(0, 0, 0, 0.55) 100%),
     linear-gradient(90deg, rgba(255, 0, 60, 0.05), transparent 12%, transparent 88%, rgba(0, 140, 255, 0.05));
 }
+/* Film grain / static. An SVG turbulence tile is rasterised once, then jittered
+   in discrete steps with translate — compositor-only, so it never repaints. The
+   element is oversized so the jitter can't drag an edge into view. */
+.crt-overlay .crt-grain {
+  position: absolute;
+  inset: -15%;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  opacity: calc(0.5 * var(--crt-grain, 0.5));
+  mix-blend-mode: overlay;
+  animation: crt-grain 0.5s steps(5) infinite;
+  will-change: transform;
+}
+@keyframes crt-grain {
+  0% { transform: translate3d(0, 0, 0); }
+  20% { transform: translate3d(-6%, 4%, 0); }
+  40% { transform: translate3d(5%, -5%, 0); }
+  60% { transform: translate3d(-4%, -3%, 0); }
+  80% { transform: translate3d(6%, 3%, 0); }
+  100% { transform: translate3d(0, 0, 0); }
+}
+
+/* Aperture grille — the fine RGB phosphor triads of a real tube. */
+.crt-overlay .crt-grille {
+  position: absolute;
+  inset: 0;
+  background-image: repeating-linear-gradient(
+    90deg,
+    rgba(255, 0, 0, 0.07) 0px,
+    rgba(255, 0, 0, 0.07) 1px,
+    rgba(0, 255, 0, 0.07) 1px,
+    rgba(0, 255, 0, 0.07) 2px,
+    rgba(0, 0, 255, 0.07) 2px,
+    rgba(0, 0, 255, 0.07) 3px
+  );
+  mix-blend-mode: screen;
+}
+
 /* the slow bright band that rolls down a real CRT */
 .crt-overlay .crt-roll {
   position: absolute;

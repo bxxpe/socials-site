@@ -1177,6 +1177,15 @@ export default function DashboardPage() {
                   onChange={(crt_intensity) => patchCfg({ crt_intensity })}
                   format={(v) => `${Math.round(v * 100)}%`}
                 />
+                <Slider
+                  label="grain"
+                  value={cfg.crt_grain}
+                  min={0}
+                  max={1.5}
+                  step={0.05}
+                  onChange={(crt_grain) => patchCfg({ crt_grain })}
+                  format={(v) => (v === 0 ? 'off' : `${Math.round(v * 100)}%`)}
+                />
               </div>
             )}
             <Toggle label="cursor trail" hint="follows the mouse (desktop only)" on={cfg.effects.trail} onChange={(v) => patchFx({ trail: v })} />

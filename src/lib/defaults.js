@@ -39,6 +39,7 @@ export const DEFAULT_CONFIG = {
   },
 
   crt_intensity: 1,
+  crt_grain: 0.5, // film-grain / static strength on top of the CRT layers
 
   // your own animated gradient on the display name
   name_gradient: false,

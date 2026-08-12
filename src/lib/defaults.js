@@ -35,7 +35,28 @@ export const DEFAULT_CONFIG = {
     trail: true,
     glare: true,
     holo: false,
+    crt: false,
   },
+
+  crt_intensity: 1,
+
+  // your own animated gradient on the display name
+  name_gradient: false,
+  name_gradient_colors: ['#a855f7', '#22d3ee'],
+  name_gradient_speed: 6, // seconds per loop
+
+  // weather chip (open-meteo — free, no key)
+  show_weather: false,
+  weather_place: '',
+  weather_lat: '',
+  weather_lon: '',
+  weather_unit: 'f',
+
+  // last.fm top artists
+  show_top_artists: false,
+  lastfm_user: '',
+  top_artists_period: '1month',
+  top_artists_count: 5,
 
   tilt_strength: 14, // max degrees of card rotation
   reflect_intensity: 1, // multiplier on the sheen/glare/holo layers
@@ -86,6 +107,9 @@ export function mergeConfig(saved) {
   const cfg = { ...DEFAULT_CONFIG, ...(saved || {}) }
   cfg.effects = { ...DEFAULT_CONFIG.effects, ...((saved && saved.effects) || {}) }
   cfg.discord = { ...DEFAULT_CONFIG.discord, ...((saved && saved.discord) || {}) }
+  if (!Array.isArray(cfg.name_gradient_colors) || cfg.name_gradient_colors.length < 2) {
+    cfg.name_gradient_colors = [...DEFAULT_CONFIG.name_gradient_colors]
+  }
   if (!Array.isArray(cfg.discord.manual_badges)) cfg.discord.manual_badges = []
   if (!Array.isArray(cfg.discord.custom_badges)) cfg.discord.custom_badges = []
   cfg.socials = Array.isArray(saved?.socials) ? saved.socials : DEFAULT_CONFIG.socials.map((s) => ({ ...s }))

@@ -4,6 +4,8 @@ import DiscordPresence from './DiscordPresence'
 import useTilt from '../hooks/useTilt'
 import useTypewriter from '../hooks/useTypewriter'
 import useLanyard from '../hooks/useLanyard'
+import useWeather from '../hooks/useWeather'
+import TopArtists from './TopArtists'
 import useClock, { useZoneDiff } from '../hooks/useClock'
 import { SocialIcon, platformOf, EyeIcon, PinIcon, ClockIcon } from '../lib/icons'
 import { contrastFor } from '../lib/defaults'
@@ -51,6 +53,16 @@ export default function ProfileView({ profile, preview = false, entered = true, 
 
   const clock = useClock(cfg.timezone, cfg.show_time, cfg.time_24h)
   const zoneDiff = useZoneDiff(cfg.timezone, cfg.show_time && cfg.show_time_diff)
+  const weather = useWeather(cfg.weather_lat, cfg.weather_lon, cfg.weather_unit, cfg.show_weather)
+
+  // Your own animated gradient — Nitro styling wins if it's also enabled.
+  const ownGradient = cfg.name_gradient && !mainNameStyle
+  const gradientVars = ownGradient
+    ? {
+        '--ng-stops': cfg.name_gradient_colors.join(', '),
+        '--ng-speed': `${cfg.name_gradient_speed}s`,
+      }
+    : null
   const mainDeco = dc.show_decoration
     ? presence?.discord_user?.avatar_decoration_data?.asset || dc.decoration
     : ''
@@ -148,7 +160,10 @@ export default function ProfileView({ profile, preview = false, entered = true, 
             </span>
           </div>
 
-          <h1 className="name" style={{ '--i': 1, ...(mainNameStyle?.css || {}) }}>
+          <h1
+            className={`name${ownGradient ? ' name-grad' : ''}`}
+            style={{ '--i': 1, ...(gradientVars || {}), ...(mainNameStyle?.css || {}) }}
+          >
             {name}
           </h1>
           <p className="handle" style={{ '--i': 2 }}>@{profile.username}</p>
@@ -181,6 +196,15 @@ export default function ProfileView({ profile, preview = false, entered = true, 
                   {zoneDiff && <span className="clock-diff">{zoneDiff}</span>}
                 </span>
               )}
+              {weather && (
+                <span className="meta-chip" title={`${weather.label}${cfg.weather_place ? ` in ${cfg.weather_place}` : ''}`}>
+                  <span className="weather-glyph">{weather.glyph}</span>
+                  <span className="clock-time">
+                    {weather.temp}
+                    {weather.unit}
+                  </span>
+                </span>
+              )}
             </div>
           )}
 
@@ -207,6 +231,14 @@ export default function ProfileView({ profile, preview = false, entered = true, 
             <DiscordPresence presence={presence} cfg={cfg} preview={preview} style={{ '--i': 7 }} />
           )}
 
+          <TopArtists
+            enabled={cfg.show_top_artists}
+            user={cfg.lastfm_user}
+            period={cfg.top_artists_period}
+            limit={cfg.top_artists_count}
+            style={{ '--i': 7.5 }}
+          />
+
           {cfg.show_views && views != null && (
             <div className="views" style={{ '--i': 8 }} title="profile views">
               <span className="views-icon">{EyeIcon}</span>
@@ -215,6 +247,12 @@ export default function ProfileView({ profile, preview = false, entered = true, 
           )}
         </section>
       </main>
+
+      {fx.crt && !preview && !reduced && (
+        <div className="crt-overlay" style={{ '--crt': cfg.crt_intensity }} aria-hidden="true">
+          <i className="crt-roll" />
+        </div>
+      )}
     </div>
   )
 }

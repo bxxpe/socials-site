@@ -8,6 +8,8 @@ import { allZones, localZone } from '../hooks/useClock'
 import { FONTS } from '../lib/fonts'
 import { THEMES } from '../lib/themes'
 import { CURSOR_THEMES, cursorThemeOf } from '../lib/cursors'
+import { geocode } from '../lib/weather'
+import { PERIODS, LASTFM_KEY } from '../lib/lastfm'
 import { badgesFrom, badgeUrl, MANUAL_BADGES } from '../lib/badges'
 import { displayNameStyle, DISPLAY_FONTS } from '../lib/discordStyles'
 import {
@@ -46,6 +48,9 @@ export default function DashboardPage() {
   const [saveErr, setSaveErr] = useState('')
   const [toast, setToast] = useState('')
   const [manualId, setManualId] = useState('')
+  const [geoQuery, setGeoQuery] = useState('')
+  const [geoResults, setGeoResults] = useState([])
+  const [geoBusy, setGeoBusy] = useState(false)
   const [dcCheck, setDcCheck] = useState({ state: 'idle' })
   const toastTimer = useRef(0)
 
@@ -146,6 +151,18 @@ export default function DashboardPage() {
     // The redirect leaves the page, so persist any pending edits first.
     if (dirty && !(await trySave())) return
     window.location.href = discordAuthorizeUrl(clientId)
+  }
+
+  const runGeocode = async () => {
+    if (!geoQuery.trim()) return
+    setGeoBusy(true)
+    try {
+      setGeoResults(await geocode(geoQuery.trim()))
+    } catch (ex) {
+      flash(ex.message || 'city lookup failed')
+    } finally {
+      setGeoBusy(false)
+    }
   }
 
   const recheckPresence = async () => {
@@ -311,6 +328,113 @@ export default function DashboardPage() {
                 maxLength={40}
               />
             </Field>
+
+            <Toggle
+              label="show weather"
+              hint="current conditions from open-meteo — free, no account, no api key"
+              on={cfg.show_weather}
+              onChange={(v) => patchCfg({ show_weather: v })}
+            />
+            {cfg.show_weather && (
+              <div className="sub-settings">
+                <Field label="location" hint={cfg.weather_place ? `using: ${cfg.weather_place}` : 'search for your city'}>
+                  <div className="upload-row">
+                    <input
+                      value={geoQuery}
+                      placeholder="e.g. austin"
+                      onChange={(e) => setGeoQuery(e.target.value)}
+                      onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), runGeocode())}
+                    />
+                    <button type="button" className="btn btn-ghost" onClick={runGeocode} disabled={geoBusy}>
+                      {geoBusy ? 'searching…' : 'search'}
+                    </button>
+                  </div>
+                </Field>
+                {geoResults.length > 0 && (
+                  <div className="geo-results">
+                    {geoResults.map((r) => (
+                      <button
+                        key={`${r.lat},${r.lon}`}
+                        type="button"
+                        className="geo-opt"
+                        onClick={() => {
+                          patchCfg({ weather_place: r.place, weather_lat: r.lat, weather_lon: r.lon })
+                          setGeoResults([])
+                          setGeoQuery('')
+                        }}
+                      >
+                        {r.place}
+                      </button>
+                    ))}
+                  </div>
+                )}
+                <Field label="units">
+                  <Segmented
+                    value={cfg.weather_unit}
+                    onChange={(weather_unit) => patchCfg({ weather_unit })}
+                    options={[
+                      { value: 'f', label: '°F' },
+                      { value: 'c', label: '°C' },
+                    ]}
+                  />
+                </Field>
+              </div>
+            )}
+
+            <Toggle
+              label="show top artists"
+              hint="your most-played artists from last.fm"
+              on={cfg.show_top_artists}
+              onChange={(v) => patchCfg({ show_top_artists: v })}
+            />
+            {cfg.show_top_artists && (
+              <div className="sub-settings">
+                {!LASTFM_KEY && (
+                  <div className="demo-note">
+                    needs a free last.fm api key: grab one at{' '}
+                    <a href="https://www.last.fm/api/account/create" target="_blank" rel="noreferrer">
+                      last.fm/api
+                    </a>
+                    , then add <code>VITE_LASTFM_KEY=…</code> to <code>.env</code> (and to Vercel) and
+                    redeploy. spotify can't do this from a static site — its top-artists endpoint
+                    needs a server.
+                  </div>
+                )}
+                <Field label="last.fm username">
+                  <input
+                    value={cfg.lastfm_user}
+                    onChange={(e) => patchCfg({ lastfm_user: e.target.value.trim() })}
+                    placeholder="your last.fm handle"
+                  />
+                </Field>
+                <div className="two-col">
+                  <Field label="time range">
+                    <select
+                      value={cfg.top_artists_period}
+                      onChange={(e) => patchCfg({ top_artists_period: e.target.value })}
+                    >
+                      {PERIODS.map((p) => (
+                        <option key={p.id} value={p.id}>
+                          {p.name}
+                        </option>
+                      ))}
+                    </select>
+                  </Field>
+                  <Field label="how many">
+                    <select
+                      value={cfg.top_artists_count}
+                      onChange={(e) => patchCfg({ top_artists_count: Number(e.target.value) })}
+                    >
+                      {[3, 4, 5, 6, 8, 10].map((n) => (
+                        <option key={n} value={n}>
+                          {n}
+                        </option>
+                      ))}
+                    </select>
+                  </Field>
+                </div>
+              </div>
+            )}
 
             <Toggle
               label="show my local time"
@@ -829,6 +953,74 @@ export default function DashboardPage() {
               </div>
             )}
 
+            <Toggle
+              label="animated gradient name"
+              hint={
+                dc.styles_on_main_name && dc.use_name_styles
+                  ? "off — your discord nitro name styling is applied to the big name instead"
+                  : 'your display name cycles through a moving gradient'
+              }
+              on={cfg.name_gradient}
+              onChange={(v) => patchCfg({ name_gradient: v })}
+            />
+            {cfg.name_gradient && (
+              <div className="sub-settings">
+                <div className="field">
+                  <span>gradient colours</span>
+                  <div className="grad-stops">
+                    {cfg.name_gradient_colors.map((c, i) => (
+                      <span className="grad-stop" key={i}>
+                        <input
+                          type="color"
+                          className="color-input"
+                          value={c}
+                          onChange={(e) => {
+                            const next = [...cfg.name_gradient_colors]
+                            next[i] = e.target.value
+                            patchCfg({ name_gradient_colors: next })
+                          }}
+                        />
+                        {cfg.name_gradient_colors.length > 2 && (
+                          <button
+                            className="mini mini-danger"
+                            aria-label="remove colour"
+                            onClick={() =>
+                              patchCfg({
+                                name_gradient_colors: cfg.name_gradient_colors.filter((_, j) => j !== i),
+                              })
+                            }
+                          >
+                            ×
+                          </button>
+                        )}
+                      </span>
+                    ))}
+                    {cfg.name_gradient_colors.length < 5 && (
+                      <button
+                        className="btn btn-ghost"
+                        onClick={() =>
+                          patchCfg({
+                            name_gradient_colors: [...cfg.name_gradient_colors, cfg.accent],
+                          })
+                        }
+                      >
+                        + colour
+                      </button>
+                    )}
+                  </div>
+                </div>
+                <Slider
+                  label="gradient speed"
+                  value={cfg.name_gradient_speed}
+                  min={1}
+                  max={20}
+                  step={0.5}
+                  onChange={(name_gradient_speed) => patchCfg({ name_gradient_speed })}
+                  format={(v) => `${v}s`}
+                />
+              </div>
+            )}
+
             <Field label="font" hint="applies to your whole page">
               <select value={cfg.font} onChange={(e) => patchCfg({ font: e.target.value })}>
                 {FONTS.map((f) => (
@@ -973,6 +1165,20 @@ export default function DashboardPage() {
               </div>
             )}
             <Toggle label="typewriter bio" hint="bio types itself out" on={cfg.effects.typewriter} onChange={(v) => patchFx({ typewriter: v })} />
+            <Toggle label="CRT screen" hint="scanlines, vignette and a rolling band, like an old monitor" on={cfg.effects.crt} onChange={(v) => patchFx({ crt: v })} />
+            {cfg.effects.crt && (
+              <div className="sub-settings">
+                <Slider
+                  label="CRT intensity"
+                  value={cfg.crt_intensity}
+                  min={0.15}
+                  max={1}
+                  step={0.05}
+                  onChange={(crt_intensity) => patchCfg({ crt_intensity })}
+                  format={(v) => `${Math.round(v * 100)}%`}
+                />
+              </div>
+            )}
             <Toggle label="cursor trail" hint="follows the mouse (desktop only)" on={cfg.effects.trail} onChange={(v) => patchFx({ trail: v })} />
 
             {cfg.effects.trail && (

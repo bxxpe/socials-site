@@ -1210,6 +1210,43 @@ input[type="range"]::-moz-range-thumb {
   border: 1px solid rgba(255, 255, 255, 0.12);
 }
 
+.geo-results {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: -8px 0 16px;
+}
+.geo-opt {
+  text-align: left;
+  padding: 9px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  font-size: 0.85rem;
+  color: var(--muted);
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+.geo-opt:hover {
+  color: var(--text);
+  border-color: color-mix(in srgb, var(--accent) 45%, transparent);
+}
+
+.grad-stops {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.grad-stop {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.grad-stop .color-input {
+  width: 52px;
+}
+
 .badge-picker {
   display: flex;
   flex-wrap: wrap;
@@ -1869,6 +1906,140 @@ input[type="range"]::-moz-range-thumb {
   gap: 16px;
   color: var(--muted);
   font-size: 0.9rem;
+}
+
+/* ---------- CRT overlay ---------- */
+/* Sits above the card so the whole page reads as one screen. All layers are
+   static gradients with opacity/transform animation only — no repaints. */
+
+.crt-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 84;
+  pointer-events: none;
+  overflow: hidden;
+  opacity: var(--crt, 1);
+}
+/* scanlines */
+.crt-overlay::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.3) 0px,
+    rgba(0, 0, 0, 0.3) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  animation: crt-flicker 4s steps(3) infinite;
+}
+/* vignette + corner darkening, like a curved tube */
+.crt-overlay::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at center, transparent 52%, rgba(0, 0, 0, 0.55) 100%),
+    linear-gradient(90deg, rgba(255, 0, 60, 0.05), transparent 12%, transparent 88%, rgba(0, 140, 255, 0.05));
+}
+/* the slow bright band that rolls down a real CRT */
+.crt-overlay .crt-roll {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 26%;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    rgba(255, 255, 255, 0.035),
+    rgba(255, 255, 255, 0.06),
+    rgba(255, 255, 255, 0.035),
+    transparent
+  );
+  animation: crt-roll 7s linear infinite;
+}
+@keyframes crt-flicker {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.94; }
+}
+@keyframes crt-roll {
+  from { transform: translate3d(0, -30vh, 0); }
+  to { transform: translate3d(0, 130vh, 0); }
+}
+
+/* ---------- animated gradient name ---------- */
+
+.name.name-grad {
+  background-image: linear-gradient(90deg, var(--ng-stops), var(--ng-stops));
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: name-slide var(--ng-speed, 6s) linear infinite;
+}
+@keyframes name-slide {
+  to {
+    background-position: 300% 50%;
+  }
+}
+
+/* ---------- weather + top artists ---------- */
+
+.weather-glyph {
+  font-size: 0.95em;
+  line-height: 1;
+}
+
+.top-artists {
+  margin-top: 18px;
+  text-align: left;
+}
+.artist-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+  scrollbar-width: none;
+}
+.artist-row::-webkit-scrollbar {
+  display: none;
+}
+.artist {
+  flex: none;
+  width: 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  transition: transform 0.18s var(--spring);
+}
+.artist:hover {
+  transform: translateY(-3px);
+}
+.artist img,
+.artist-fallback {
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  object-fit: cover;
+  display: grid;
+  place-items: center;
+  background: color-mix(in srgb, var(--accent) 22%, #14111d);
+  font-weight: 800;
+  text-transform: uppercase;
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+.artist-name {
+  font-size: 0.64rem;
+  color: var(--muted);
+  text-align: center;
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* ---------- cursor themes ---------- */

@@ -40,6 +40,9 @@ export const DEFAULT_CONFIG = {
 
   crt_intensity: 1,
   crt_grain: 0.5, // film-grain / static strength on top of the CRT layers
+  crt_grain_size: 3, // magnification of the noise tile — higher = chunkier grain
+  crt_grille_size: 2, // px per RGB phosphor stripe
+  crt_scanline_size: 1, // px per scanline
 
   // your own animated gradient on the display name
   name_gradient: false,

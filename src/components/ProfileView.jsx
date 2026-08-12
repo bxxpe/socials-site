@@ -251,7 +251,13 @@ export default function ProfileView({ profile, preview = false, entered = true, 
       {fx.crt && !preview && !reduced && (
         <div
           className="crt-overlay"
-          style={{ '--crt': cfg.crt_intensity, '--crt-grain': cfg.crt_grain }}
+          style={{
+            '--crt': cfg.crt_intensity,
+            '--crt-grain': cfg.crt_grain,
+            '--crt-grain-size': cfg.crt_grain_size,
+            '--crt-grille-size': cfg.crt_grille_size,
+            '--crt-scanline-size': cfg.crt_scanline_size,
+          }}
           aria-hidden="true"
         >
           <i className="crt-grain" />

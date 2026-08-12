@@ -1186,6 +1186,33 @@ export default function DashboardPage() {
                   onChange={(crt_grain) => patchCfg({ crt_grain })}
                   format={(v) => (v === 0 ? 'off' : `${Math.round(v * 100)}%`)}
                 />
+                <Slider
+                  label="grain size"
+                  value={cfg.crt_grain_size}
+                  min={1}
+                  max={8}
+                  step={1}
+                  onChange={(crt_grain_size) => patchCfg({ crt_grain_size })}
+                  format={(v) => `${v}px blocks`}
+                />
+                <Slider
+                  label="grille thickness"
+                  value={cfg.crt_grille_size}
+                  min={1}
+                  max={6}
+                  step={1}
+                  onChange={(crt_grille_size) => patchCfg({ crt_grille_size })}
+                  format={(v) => `${v}px stripes (${v * 3}px triad)`}
+                />
+                <Slider
+                  label="scanline thickness"
+                  value={cfg.crt_scanline_size}
+                  min={1}
+                  max={5}
+                  step={1}
+                  onChange={(crt_scanline_size) => patchCfg({ crt_scanline_size })}
+                  format={(v) => `${v}px`}
+                />
               </div>
             )}
             <Toggle label="cursor trail" hint="follows the mouse (desktop only)" on={cfg.effects.trail} onChange={(v) => patchFx({ trail: v })} />

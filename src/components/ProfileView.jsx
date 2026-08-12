@@ -5,6 +5,7 @@ import useTilt from '../hooks/useTilt'
 import useTypewriter from '../hooks/useTypewriter'
 import useLanyard from '../hooks/useLanyard'
 import useWeather from '../hooks/useWeather'
+import CrtScreen from './CrtScreen'
 import TopArtists from './TopArtists'
 import useClock, { useZoneDiff } from '../hooks/useClock'
 import { SocialIcon, platformOf, EyeIcon, PinIcon, ClockIcon } from '../lib/icons'
@@ -52,23 +53,11 @@ export default function ProfileView({ profile, preview = false, entered = true, 
       : null
 
   /**
-   * CRT curvature.
-   *
-   * Each set of lines is an arc from a circle whose centre sits far OFF the
-   * screen — that's what makes them bow like a tube instead of converging
-   * into a bullseye at the middle. Curvature is just how far away that centre
-   * is: push it out to ~20 screens and the arcs are visually straight.
-   *
-   * Scanlines use two mirrored layers (centre above / below) and the grille
-   * two more (left / right), so the bow is symmetric rather than all leaning
-   * one way. Their masks cross-fade, so there's no seam down the middle.
+   * CRT curvature bulges the *content* (see CrtScreen), not the overlay —
+   * the scanlines and grille stay straight, like a flat shadow mask sitting
+   * in front of a curved tube. This var only drives the corner shading.
    */
-  const crtR = (90 + (1 - (cfg.crt_curve || 0)) * 1900).toFixed(0)
-  const crtCurveVars = {
-    '--crt-curve': cfg.crt_curve,
-    '--crt-ry': `${crtR}vh`,
-    '--crt-rx': `${crtR}vw`,
-  }
+  const crtCurveVars = { '--crt-curve': cfg.crt_curve }
 
   const clock = useClock(cfg.timezone, cfg.show_time, cfg.time_24h)
   const zoneDiff = useZoneDiff(cfg.timezone, cfg.show_time && cfg.show_time_diff)
@@ -268,6 +257,8 @@ export default function ProfileView({ profile, preview = false, entered = true, 
           )}
         </section>
       </main>
+
+      {!preview && <CrtScreen curve={cfg.crt_curve} enabled={fx.crt && !reduced} />}
 
       {fx.crt && !preview && !reduced && (
         <div

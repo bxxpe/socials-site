@@ -1935,32 +1935,20 @@ input[type="range"]::-moz-range-thumb {
     calc(var(--crt-curve, 0) * 5vmin) rgba(0, 0, 0, 0.65);
 }
 
-/* ---- bowed scanlines ----
-   Arcs of a circle whose centre is far above (or below) the viewport. Because
-   the centre is off-screen there's no bullseye — just gentle parallel bows.
-   Two mirrored halves cross-fade so the curvature is symmetric and seamless. */
+/* Scanlines stay dead straight — the curvature lives in the warped content
+   underneath, exactly like a real tube with a flat shadow mask in front. */
 .crt-overlay .crt-scan {
   position: absolute;
   inset: 0;
   --sl: calc(1px * var(--crt-scanline-size, 1));
-  background: repeating-radial-gradient(
-    circle at 50% var(--cy),
+  background: repeating-linear-gradient(
+    to bottom,
     rgba(0, 0, 0, 0.32) 0px,
     rgba(0, 0, 0, 0.32) var(--sl),
     transparent var(--sl),
     transparent calc(var(--sl) * 3)
   );
   animation: crt-flicker 4s steps(3) infinite;
-}
-.crt-overlay .crt-scan-t {
-  --cy: calc(50% - var(--crt-ry, 2000vh));
-  -webkit-mask-image: linear-gradient(to bottom, #000 30%, transparent 70%);
-  mask-image: linear-gradient(to bottom, #000 30%, transparent 70%);
-}
-.crt-overlay .crt-scan-b {
-  --cy: calc(50% + var(--crt-ry, 2000vh));
-  -webkit-mask-image: linear-gradient(to top, #000 30%, transparent 70%);
-  mask-image: linear-gradient(to top, #000 30%, transparent 70%);
 }
 /* vignette + corner darkening, like a curved tube */
 .crt-overlay::after {
@@ -2005,11 +1993,10 @@ input[type="range"]::-moz-range-thumb {
 .crt-overlay .crt-grille {
   position: absolute;
   inset: 0;
-  /* Same trick as the scanlines, rotated 90°: centre far to the left/right so
-     the phosphor stripes bow outward instead of meeting in the middle. */
+  /* Straight vertical phosphor stripes, like the physical shadow mask. */
   --gw: calc(1px * var(--crt-grille-size, 2));
-  background-image: repeating-radial-gradient(
-    circle at var(--cx) 50%,
+  background-image: repeating-linear-gradient(
+    90deg,
     rgba(255, 0, 0, 0.11) 0px,
     rgba(255, 0, 0, 0.11) var(--gw),
     rgba(0, 255, 0, 0.11) var(--gw),
@@ -2019,15 +2006,12 @@ input[type="range"]::-moz-range-thumb {
   );
   mix-blend-mode: screen;
 }
-.crt-overlay .crt-grille-l {
-  --cx: calc(50% - var(--crt-rx, 2000vw));
-  -webkit-mask-image: linear-gradient(to right, #000 30%, transparent 70%);
-  mask-image: linear-gradient(to right, #000 30%, transparent 70%);
-}
-.crt-overlay .crt-grille-r {
-  --cx: calc(50% + var(--crt-rx, 2000vw));
-  -webkit-mask-image: linear-gradient(to left, #000 30%, transparent 70%);
-  mask-image: linear-gradient(to left, #000 30%, transparent 70%);
+
+/* The actual screen bulge. `filter` warps the rendered content, so this must
+   sit on a wrapper around the page — never on the overlay, or the scanlines
+   would bend with it. */
+body.crt-warped .profile-center {
+  filter: url(#crt-barrel);
 }
 
 /* the slow bright band that rolls down a real CRT */

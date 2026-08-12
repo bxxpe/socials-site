@@ -283,10 +283,8 @@ export default function ProfileView({ profile, preview = false, entered = true, 
           aria-hidden="true"
         >
           <i className="crt-grain" />
-          <i className="crt-scan crt-scan-t" />
-          <i className="crt-scan crt-scan-b" />
-          <i className="crt-grille crt-grille-l" />
-          <i className="crt-grille crt-grille-r" />
+          <i className="crt-scan" />
+          <i className="crt-grille" />
           <i className="crt-roll" />
         </div>
       )}

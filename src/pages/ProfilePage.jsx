@@ -4,7 +4,8 @@ import ProfileView from '../components/ProfileView'
 import AudioDock from '../components/AudioDock'
 import CursorTrail from '../components/CursorTrail'
 import CursorTheme from '../components/CursorTheme'
-import { fetchPublicProfile, incrementViews } from '../lib/store'
+import { fetchPublicProfile, incrementViews, getSession } from '../lib/store'
+import { shouldCountView } from '../lib/visitor'
 import { PageLoader } from '../App'
 
 export default function ProfilePage() {
@@ -16,13 +17,16 @@ export default function ProfilePage() {
 
   useEffect(() => {
     let alive = true
-    fetchPublicProfile().then((p) => {
+    Promise.all([fetchPublicProfile(), getSession()]).then(([p, session]) => {
       if (!alive) return
       setProfile(p)
       if (!p) return
       document.title = p.config.display_name || p.username
-      // Count one view per browser session.
-      if (!sessionStorage.getItem('socials.viewed')) {
+
+      // One view per browser session, and only for real visitors — your own
+      // visits and script-driven previews are skipped.
+      const { count } = shouldCountView(p.id, session?.user?.id)
+      if (count) {
         sessionStorage.setItem('socials.viewed', '1')
         incrementViews(p.id)
         setViews((p.views || 0) + 1)

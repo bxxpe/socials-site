@@ -51,6 +51,24 @@ export default function ProfileView({ profile, preview = false, entered = true, 
         })
       : null
 
+  /**
+   * CRT curvature. The grille and scanlines are repeating *radial* gradients;
+   * how elongated the ellipse is decides how much the lines bow. A very
+   * stretched ellipse is indistinguishable from straight lines, so one
+   * "aspect" number scales smoothly from flat panel to bulging tube.
+   *
+   * Radial colour stops are measured along the horizontal ray, so the
+   * scanline step has to be pre-multiplied by the aspect to keep its actual
+   * vertical spacing equal to the chosen thickness.
+   */
+  const crtAspect = 60 - (cfg.crt_curve || 0) * 56
+  const crtCurveVars = {
+    '--crt-curve': cfg.crt_curve,
+    '--crt-grille-ry': `${Math.round(crtAspect * 100)}%`,
+    '--crt-scan-rx': `${Math.round(crtAspect * 100)}%`,
+    '--crt-scan-step': `${(cfg.crt_scanline_size * crtAspect).toFixed(2)}px`,
+  }
+
   const clock = useClock(cfg.timezone, cfg.show_time, cfg.time_24h)
   const zoneDiff = useZoneDiff(cfg.timezone, cfg.show_time && cfg.show_time_diff)
   const weather = useWeather(cfg.weather_lat, cfg.weather_lon, cfg.weather_unit, cfg.show_weather)
@@ -84,6 +102,8 @@ export default function ProfileView({ profile, preview = false, entered = true, 
     '--font': fontStack,
     '--presence-font': dc.presence_font ? resolveFont(dc.presence_font, discordFontId) : fontStack,
     '--reflect': cfg.reflect_intensity,
+    '--fs': cfg.font_scale,
+    '--ls': `${cfg.letter_spacing}em`,
     // a full cursor theme wins over a single custom image
     ...(cfg.cursor_url && cfg.cursor_theme === 'none' && !preview
       ? { cursor: `url(${JSON.stringify(cfg.cursor_url)}) 4 4, auto` }
@@ -257,6 +277,7 @@ export default function ProfileView({ profile, preview = false, entered = true, 
             '--crt-grain-size': cfg.crt_grain_size,
             '--crt-grille-size': cfg.crt_grille_size,
             '--crt-scanline-size': cfg.crt_scanline_size,
+            ...crtCurveVars,
           }}
           aria-hidden="true"
         >

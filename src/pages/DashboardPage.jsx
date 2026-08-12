@@ -1032,6 +1032,25 @@ export default function DashboardPage() {
             </Field>
 
             <Slider
+              label="text size"
+              value={cfg.font_scale}
+              min={0.75}
+              max={1.5}
+              step={0.05}
+              onChange={(font_scale) => patchCfg({ font_scale })}
+              format={(v) => `${Math.round(v * 100)}%`}
+            />
+            <Slider
+              label="letter spacing"
+              value={cfg.letter_spacing}
+              min={-0.05}
+              max={0.3}
+              step={0.01}
+              onChange={(letter_spacing) => patchCfg({ letter_spacing })}
+              format={(v) => `${v}em`}
+            />
+
+            <Slider
               label="card opacity"
               value={cfg.card_opacity}
               min={0.1}
@@ -1212,6 +1231,15 @@ export default function DashboardPage() {
                   step={1}
                   onChange={(crt_scanline_size) => patchCfg({ crt_scanline_size })}
                   format={(v) => `${v}px`}
+                />
+                <Slider
+                  label="screen curvature"
+                  value={cfg.crt_curve}
+                  min={0}
+                  max={1}
+                  step={0.05}
+                  onChange={(crt_curve) => patchCfg({ crt_curve })}
+                  format={(v) => (v === 0 ? 'flat panel' : `${Math.round(v * 100)}% bowed`)}
                 />
               </div>
             )}

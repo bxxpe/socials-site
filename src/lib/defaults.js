@@ -16,6 +16,8 @@ export const DEFAULT_CONFIG = {
   bg_blur: 0,
   bg_brightness: 0.55,
   font: 'system',
+  font_scale: 1, // multiplies every text size on the card
+  letter_spacing: 0, // em, applied across the card
   card_opacity: 0.55,
   card_blur: 24,
   icon_style: 'mono', // 'mono' | 'brand'
@@ -43,6 +45,7 @@ export const DEFAULT_CONFIG = {
   crt_grain_size: 3, // magnification of the noise tile — higher = chunkier grain
   crt_grille_size: 2, // px per RGB phosphor stripe
   crt_scanline_size: 1, // px per scanline
+  crt_curve: 0.35, // 0 = flat panel, 1 = heavily bowed tube
 
   // your own animated gradient on the display name
   name_gradient: false,

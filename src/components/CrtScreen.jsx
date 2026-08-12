@@ -15,7 +15,13 @@ import { useEffect } from 'react'
 const SIZE = 128
 const FILTER_ID = 'crt-barrel'
 
+// The map's shape never changes — only how hard it's applied (feDisplacementMap
+// `scale`). So build it once and reuse it, instead of re-running a 16k-pixel
+// loop and a PNG encode on every tick of the curvature slider.
+let cachedMap = null
+
 function buildBarrelMap(k) {
+  if (cachedMap) return cachedMap
   const c = document.createElement('canvas')
   c.width = c.height = SIZE
   const ctx = c.getContext('2d')
@@ -34,19 +40,23 @@ function buildBarrelMap(k) {
     }
   }
   ctx.putImageData(img, 0, 0)
-  return c.toDataURL('image/png')
+  cachedMap = c.toDataURL('image/png')
+  return cachedMap
 }
 
 export default function CrtScreen({ curve = 0, enabled = false }) {
   useEffect(() => {
     const on = enabled && curve > 0
-    let svg = document.getElementById('crt-barrel-svg')
+    // querySelectorAll, not getElementById — never leave a duplicate behind
+    const dropAll = () =>
+      document.querySelectorAll('#crt-barrel-svg').forEach((n) => n.remove())
 
     if (!on) {
-      svg?.remove()
+      dropAll()
       document.body.classList.remove('crt-warped')
       return
     }
+    let svg = document.getElementById('crt-barrel-svg')
 
     const href = buildBarrelMap(1)
     // displacement strength in px — scaled by the curve slider
@@ -70,7 +80,7 @@ export default function CrtScreen({ curve = 0, enabled = false }) {
     document.body.classList.add('crt-warped')
 
     return () => {
-      document.getElementById('crt-barrel-svg')?.remove()
+      dropAll()
       document.body.classList.remove('crt-warped')
     }
   }, [curve, enabled])

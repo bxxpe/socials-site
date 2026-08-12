@@ -1924,22 +1924,43 @@ input[type="range"]::-moz-range-thumb {
   overflow: hidden;
   opacity: var(--crt, 1);
 }
-/* scanlines */
+/* Corner shadowing — glass bulging away from you at the edges. */
 .crt-overlay::before {
   content: "";
   position: absolute;
   inset: 0;
-  /* Radial rather than linear so the lines bow with the tube. A very wide
-     ellipse reads as dead-straight, so --crt-scan-rx alone drives curvature. */
-  --sl: var(--crt-scan-step, 1px);
+  z-index: 2;
+  border-radius: calc(var(--crt-curve, 0) * 5vmin);
+  box-shadow: inset 0 0 calc(var(--crt-curve, 0) * 16vmin)
+    calc(var(--crt-curve, 0) * 5vmin) rgba(0, 0, 0, 0.65);
+}
+
+/* ---- bowed scanlines ----
+   Arcs of a circle whose centre is far above (or below) the viewport. Because
+   the centre is off-screen there's no bullseye — just gentle parallel bows.
+   Two mirrored halves cross-fade so the curvature is symmetric and seamless. */
+.crt-overlay .crt-scan {
+  position: absolute;
+  inset: 0;
+  --sl: calc(1px * var(--crt-scanline-size, 1));
   background: repeating-radial-gradient(
-    ellipse var(--crt-scan-rx, 6000%) 100% at 50% 50%,
+    circle at 50% var(--cy),
     rgba(0, 0, 0, 0.32) 0px,
     rgba(0, 0, 0, 0.32) var(--sl),
     transparent var(--sl),
     transparent calc(var(--sl) * 3)
   );
   animation: crt-flicker 4s steps(3) infinite;
+}
+.crt-overlay .crt-scan-t {
+  --cy: calc(50% - var(--crt-ry, 2000vh));
+  -webkit-mask-image: linear-gradient(to bottom, #000 30%, transparent 70%);
+  mask-image: linear-gradient(to bottom, #000 30%, transparent 70%);
+}
+.crt-overlay .crt-scan-b {
+  --cy: calc(50% + var(--crt-ry, 2000vh));
+  -webkit-mask-image: linear-gradient(to top, #000 30%, transparent 70%);
+  mask-image: linear-gradient(to top, #000 30%, transparent 70%);
 }
 /* vignette + corner darkening, like a curved tube */
 .crt-overlay::after {
@@ -1954,16 +1975,6 @@ input[type="range"]::-moz-range-thumb {
       rgba(0, 0, 0, calc(0.5 + var(--crt-curve, 0) * 0.25)) 100%
     ),
     linear-gradient(90deg, rgba(255, 0, 60, 0.05), transparent 12%, transparent 88%, rgba(0, 140, 255, 0.05));
-}
-/* corner shadowing, so the glass reads as bulging rather than flat */
-.crt-overlay .crt-grille::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  box-shadow: inset 0 0 calc(var(--crt-curve, 0) * 14vmin)
-    calc(var(--crt-curve, 0) * 4vmin) rgba(0, 0, 0, 0.6);
-  border-radius: calc(var(--crt-curve, 0) * 4vmin);
-  pointer-events: none;
 }
 /* Film grain / static. An SVG turbulence tile is rasterised once, then jittered
    in discrete steps with translate â€” compositor-only, so it never repaints. The
@@ -1994,10 +2005,11 @@ input[type="range"]::-moz-range-thumb {
 .crt-overlay .crt-grille {
   position: absolute;
   inset: 0;
-  /* Tall ellipse => near-vertical stripes; shrinking it bows them outward. */
+  /* Same trick as the scanlines, rotated 90°: centre far to the left/right so
+     the phosphor stripes bow outward instead of meeting in the middle. */
   --gw: calc(1px * var(--crt-grille-size, 2));
   background-image: repeating-radial-gradient(
-    ellipse 100% var(--crt-grille-ry, 6000%) at 50% 50%,
+    circle at var(--cx) 50%,
     rgba(255, 0, 0, 0.11) 0px,
     rgba(255, 0, 0, 0.11) var(--gw),
     rgba(0, 255, 0, 0.11) var(--gw),
@@ -2006,6 +2018,16 @@ input[type="range"]::-moz-range-thumb {
     rgba(0, 0, 255, 0.11) calc(var(--gw) * 3)
   );
   mix-blend-mode: screen;
+}
+.crt-overlay .crt-grille-l {
+  --cx: calc(50% - var(--crt-rx, 2000vw));
+  -webkit-mask-image: linear-gradient(to right, #000 30%, transparent 70%);
+  mask-image: linear-gradient(to right, #000 30%, transparent 70%);
+}
+.crt-overlay .crt-grille-r {
+  --cx: calc(50% + var(--crt-rx, 2000vw));
+  -webkit-mask-image: linear-gradient(to left, #000 30%, transparent 70%);
+  mask-image: linear-gradient(to left, #000 30%, transparent 70%);
 }
 
 /* the slow bright band that rolls down a real CRT */

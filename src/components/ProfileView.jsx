@@ -52,21 +52,22 @@ export default function ProfileView({ profile, preview = false, entered = true, 
       : null
 
   /**
-   * CRT curvature. The grille and scanlines are repeating *radial* gradients;
-   * how elongated the ellipse is decides how much the lines bow. A very
-   * stretched ellipse is indistinguishable from straight lines, so one
-   * "aspect" number scales smoothly from flat panel to bulging tube.
+   * CRT curvature.
    *
-   * Radial colour stops are measured along the horizontal ray, so the
-   * scanline step has to be pre-multiplied by the aspect to keep its actual
-   * vertical spacing equal to the chosen thickness.
+   * Each set of lines is an arc from a circle whose centre sits far OFF the
+   * screen — that's what makes them bow like a tube instead of converging
+   * into a bullseye at the middle. Curvature is just how far away that centre
+   * is: push it out to ~20 screens and the arcs are visually straight.
+   *
+   * Scanlines use two mirrored layers (centre above / below) and the grille
+   * two more (left / right), so the bow is symmetric rather than all leaning
+   * one way. Their masks cross-fade, so there's no seam down the middle.
    */
-  const crtAspect = 60 - (cfg.crt_curve || 0) * 56
+  const crtR = (90 + (1 - (cfg.crt_curve || 0)) * 1900).toFixed(0)
   const crtCurveVars = {
     '--crt-curve': cfg.crt_curve,
-    '--crt-grille-ry': `${Math.round(crtAspect * 100)}%`,
-    '--crt-scan-rx': `${Math.round(crtAspect * 100)}%`,
-    '--crt-scan-step': `${(cfg.crt_scanline_size * crtAspect).toFixed(2)}px`,
+    '--crt-ry': `${crtR}vh`,
+    '--crt-rx': `${crtR}vw`,
   }
 
   const clock = useClock(cfg.timezone, cfg.show_time, cfg.time_24h)
@@ -282,7 +283,10 @@ export default function ProfileView({ profile, preview = false, entered = true, 
           aria-hidden="true"
         >
           <i className="crt-grain" />
-          <i className="crt-grille" />
+          <i className="crt-scan crt-scan-t" />
+          <i className="crt-scan crt-scan-b" />
+          <i className="crt-grille crt-grille-l" />
+          <i className="crt-grille crt-grille-r" />
           <i className="crt-roll" />
         </div>
       )}
